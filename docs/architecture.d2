@@ -1,0 +1,76 @@
+a: |`md
+  # Admin Dashboard
+    - This is high-level architecture of the system. It is a simple diagram that shows the relationship between the user, server, and relayer.
+    - The user interacts with the server, which is composed of a frontend and backend.
+    - The server communicates with the relayer, which is composed of an engine and connection.
+    - The engine and connection communicate with each other using a Unix domain socket.
+`|
+
+user: {
+  label: "Users"
+  icon: https://icons.terrastruct.com/essentials%2F359-users.svg
+}
+
+server: {
+  label: "Server"
+  icon: https://icons.terrastruct.com/essentials%2F112-server.svg
+  style: {
+    font-color: blue
+    stroke-dash: 1
+  }
+  dashboard: {
+    label: "Next.js"
+    icon: https://icons.terrastruct.com/essentials%2F006-window.svg
+    style: {
+      font-color: blue
+      stroke-dash: 2
+    }
+    frontend: {
+      icon: https://icons.terrastruct.com/essentials%2F092-graph%20bar.svg
+      style: {
+        shadow: true
+      }
+    }
+    backend: Backend {
+      icon: https://icons.terrastruct.com/essentials%2F032-settings-1.svg
+      style: {
+        shadow: true
+      }
+    }
+    frontend -> backend: {
+      label: "API"
+    }
+  }
+  relayer: {
+    label: "Relayer"
+    icon: https://icons.terrastruct.com/infra%2F041-tower.svg
+    style: {
+      shadow: true
+      stroke-dash: 2
+    }
+    engine: {
+      label: "Engine"
+      icon: https://icons.terrastruct.com/infra%2F021-hardware.svg
+      style: {
+        shadow: true
+      }
+    }
+    connection: {
+      label: "Socket"
+      icon: https://icons.terrastruct.com/essentials%2F257-file.svg
+      style: {
+        shadow: true
+      }
+    }
+    engine <-> connection: {
+      label: "Unix"
+    }
+  }
+  dashboard.backend <-> relayer.connection: {
+    label: "Unix"
+  }
+}
+
+user -> server.dashboard.frontend: {
+  label: "HTTP"
+}
