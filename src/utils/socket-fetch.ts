@@ -87,7 +87,7 @@ class SocketManager extends EventEmitter {
         try {
           this.socket.write(JSON.stringify(packet), (err) => {
             if (err) {
-              reject(err) // Handle socket write error
+              reject(err)
             } else if (responseTimeout) {
               this.waitForResponse<T>(packet.id, responseTimeout)
                 .then(resolve)

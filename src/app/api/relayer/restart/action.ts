@@ -12,7 +12,7 @@ const schema = z.object({
     .min(1),
 })
 
-interface RestartRequest {
+interface Request {
   event: string;
   chain: string;
   start_height: number;

@@ -9,6 +9,16 @@ const nextConfig = {
     includePaths: [path.join(__dirname, 'styles')],
   },
   generateBuildId: async () => process.env.GIT_HASH || 'development',
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '3000',
+        pathname: '/assets/**',
+      },
+    ],
+  },
 }
 
 module.exports = nextConfig

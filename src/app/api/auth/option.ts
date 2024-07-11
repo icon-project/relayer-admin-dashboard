@@ -45,7 +45,7 @@ export const authOptions: NextAuthOptions = {
         if (!user) {
           throw new Error(dict.login.message.auth_failed)
         }
-        return { ...user, password: '' }
+        return { ...user, password: null }
       },
     }),
   ],

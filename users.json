@@ -1,6 +1,7 @@
 [{
   "id": 1,
   "email": "admin@venture23.io",
+  "avatar": "http://localhost:3000/assets/avatar1.png",
   "password": "password",
   "company": "Venture23 Inc.",
   "designation": "None"
