@@ -28,7 +28,7 @@ type FormState = {
   };
 }
 
-export default async function create(prevState: FormState, formData: FormData): Promise<FormState> {
+export default async function restart(prevState: FormState, formData: FormData): Promise<FormState> {
   const validatedFields = schema.safeParse({
     chain: formData.get('chain'),
     start_height: formData.get('start_height'),

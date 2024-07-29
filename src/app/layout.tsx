@@ -2,8 +2,9 @@ import '@/styles/globals.scss'
 // Next.js allows you to import CSS directly in .js files.
 // It handles optimization and all the necessary Webpack configuration to make this work.
 import ProgressBar from '@/components/ProgressBar/ProgressBar'
-import DictionaryProvider from '@/locales/DictionaryProvider'
+import { defaultLocale } from '@/locales/config'
 import { getDictionary } from '@/locales/dictionary'
+import DictionaryProvider from '@/locales/DictionaryProvider'
 import getTheme from '@/themes/theme'
 import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
@@ -22,7 +23,7 @@ export default async function RootLayout({
   const dictionary = await getDictionary()
 
   return (
-    <html lang="en" data-bs-theme={getTheme()}>
+    <html lang={defaultLocale} data-bs-theme={getTheme()}>
       <body>
         <ProgressBar />
         <DictionaryProvider dictionary={dictionary}>

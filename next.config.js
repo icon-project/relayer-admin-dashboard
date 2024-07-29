@@ -6,7 +6,7 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   sassOptions: {
-    includePaths: [path.join(__dirname, 'styles')],
+    includePaths: [ path.join(__dirname, 'styles') ],
   },
   generateBuildId: async () => process.env.GIT_HASH || 'development',
   images: {

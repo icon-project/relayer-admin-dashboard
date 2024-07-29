@@ -24,13 +24,12 @@ export default async function middleware(request: NextRequest, event: NextFetchE
    */
   if (![
     '/login',
-    '/register',
   ].includes(request.nextUrl.pathname)) {
     const res: NextMiddlewareResult = await withAuth(
       // Response with local cookies
       () => response,
       {
-      // Matches the pages config in `[...nextauth]`
+        // Matches the pages config in `[...nextauth]`
         pages: {
           signIn: '/login',
         },
