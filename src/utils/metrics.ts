@@ -1,9 +1,13 @@
+import 'server-only';
+
 import os from 'os';
 
 interface MemoryMetrics {
   totalMemory: number;
   usedMemory: number;
   freeMemory: number;
+  usedMemoryPercentage: number;
+  freeMemoryPercentage: number;
 }
 
 interface NetworkMetrics {
@@ -12,20 +16,35 @@ interface NetworkMetrics {
 }
 
 interface SystemMetrics {
-  cpuUsage: number[];
+  cpuUsage: number;
   memory: MemoryMetrics;
   networkMetrics: NetworkMetrics;
-  uptime: number;
+  uptime: string;
+  timestamp: number;
+}
+
+function formatUptime(seconds: number): string {
+  const days = Math.floor(seconds / (24 * 3600));
+  seconds %= 24 * 3600;
+  const hours = Math.floor(seconds / 3600);
+  seconds %= 3600;
+  const minutes = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+
+  return `${days}d ${hours}h ${minutes}m ${secs}s`;
 }
 
 export default async function fetchMetrics(): Promise<SystemMetrics> {
-  const cpuUsage = os.loadavg() // Average CPU Load over 1, 5, and 15 minutes
-  const totalMemory = os.totalmem()
-  const freeMemory = os.freemem()
-  const usedMemory = totalMemory - freeMemory
-  const uptime = os.uptime()
+  const cpuUsage = Math.round(os.loadavg()[0] * 100) / 100;
+  const totalMemory = os.totalmem();
+  const freeMemory = os.freemem();
+  const usedMemory = totalMemory - freeMemory;
+  const usedMemoryPercentage = Math.round((usedMemory / totalMemory) * 10000) / 100;
+  const freeMemoryPercentage = Math.round((freeMemory / totalMemory) * 10000) / 100;
+  const uptime = formatUptime(os.uptime());
+  const timestamp = Date.now();
 
-  const networkMetrics: NetworkMetrics = { uploadSpeed: 'placeholder', downloadSpeed: 'placeholder' }
+  const networkMetrics: NetworkMetrics = { uploadSpeed: 'placeholder', downloadSpeed: 'placeholder' };
 
   return {
     cpuUsage,
@@ -33,8 +52,13 @@ export default async function fetchMetrics(): Promise<SystemMetrics> {
       totalMemory,
       usedMemory,
       freeMemory,
+      usedMemoryPercentage,
+      freeMemoryPercentage,
     },
     networkMetrics,
     uptime,
-  }
+    timestamp,
+  };
 }
+
+export type { MemoryMetrics, NetworkMetrics, SystemMetrics };

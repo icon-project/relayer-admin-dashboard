@@ -1,23 +1,22 @@
 import EventEmitter from 'events';
 import { createConnection, Socket } from 'net';
-import 'server-only';
 
 interface Packet {
   id: string;
   event: string;
-  data: unknown;
+  data: string;
 }
 
 interface SocketResponse<T> {
   status: 'success' | 'error';
-  data?: T;
+  data?: string;
   message?: string;
 }
 
 class SocketManager extends EventEmitter {
   private socket: Socket | null = null
 
-  private readonly socketPath: string = process.env.RELAYER_SOCKET_PATH || '/tmp/relayer.sock'
+  private readonly socketPath: string = process.env.NEXT_RELAYER_SOCKET_PATH || '/tmp/relayer.sock'
 
   private retryCount: number = 0
 
@@ -70,7 +69,7 @@ class SocketManager extends EventEmitter {
   private waitForResponse<T>(packetId: string, timeout: number): Promise<SocketResponse<T>> {
     return new Promise((resolve, reject) => {
       const timeoutHandle = setTimeout(() => {
-        this.removeListener(packetId, () => {})
+        this.removeListener(packetId, () => { })
         reject(new Error('Response timeout'))
       }, timeout)
 

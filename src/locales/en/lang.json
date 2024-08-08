@@ -56,9 +56,9 @@
         "action3": "Something else"
       }
     },
-    "traffic": {
-      "title": "Traffic",
-      "duration": "January - July 2021",
+    "utilization": {
+      "title": "Resource Utilization",
+      "uptime": "Uptime",
       "option": {
         "day": "Day",
         "month": "Month",
@@ -73,9 +73,9 @@
         "xlabel6": "June",
         "xlabel7": "July"
       },
-      "users": "Users",
-      "views": "Views",
-      "category1": "Visits",
+      "cpu": "CPU",
+      "memory": "Memory",
+      "network": "Network",
       "category2": "Unique",
       "category3": "Page views",
       "category4": "New users",
@@ -95,34 +95,22 @@
         "label2": "Feeds"
       }
     },
-    "sales": {
-      "title": "Traffic & Sales",
+    "xcall": {
+      "title": "Xcall Stats",
       "stats": {
-        "stat1": "New Clients",
-        "stat2": "Recurring Clients",
-        "stat3": "Page Views",
-        "stat4": "Organic"
-      },
-      "monday": "Monday",
-      "tuesday": "Tuesday",
-      "wednesday": "Wednesday",
-      "thursday": "Thursday",
-      "friday": "Friday",
-      "saturday": "Saturday",
-      "sunday": "Sunday",
-      "male": "Male",
-      "female": "Female",
-      "organic": "Organic Search",
-      "facebook": "Facebook",
-      "twitter": "Twitter",
-      "linkedin": "LinkedIn"
+        "total": "Total",
+        "pending": "Pending",
+        "delivered": "Delivered",
+        "executed": "Executed"
+      }
     },
     "listing": {
       "headers": {
-        "header1": "User",
-        "header2": "Usage",
-        "header3": "Payment Method",
-        "header4": "Activity"
+        "src_chain": "Source",
+        "dest_chain": "Dest",
+        "status": "Status",
+        "created": "Created",
+        "last_activity": "Activity"
       },
       "user_status": {
         "new": "New",

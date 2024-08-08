@@ -1,8 +1,8 @@
-// dataFetcher.ts
+import 'server-only';
 
 import serverFetch from './server-fetch';
 
-const BASE_URL = process.env.XCALL_BASE_URL;
+const BASE_URL = process.env.NEXT_XCALLSCAN_BASE_URL;
 
 interface Message {
   id: number;
@@ -56,6 +56,46 @@ interface TotalMessagesResponse {
   };
 }
 
+interface StatisticResponse {
+  data: {
+    messages: number;
+    fees: {
+      icon: string;
+      bsc: string;
+      eth2: string;
+      havah: string;
+      ibc_archway: string;
+      ibc_neutron: string;
+      ibc_injective: string;
+      avax: string;
+      base: string;
+      arbitrum: string;
+      optimism: string;
+      sui: string;
+      polygon: string;
+    };
+  };
+  meta: {
+    urls: {
+      tx: {
+        bsc: string;
+        icon: string;
+        eth2: string;
+        havah: string;
+        ibc_archway: string;
+        ibc_neutron: string;
+        ibc_injective: string;
+        avax: string;
+        base: string;
+        arbitrum: string;
+        optimism: string;
+        sui: string;
+        polygon: string;
+      };
+    };
+  };
+}
+
 enum MessageStatus {
   PENDING = 'pending',
   CONFIRMED = 'confirmed',
@@ -72,20 +112,28 @@ interface MessageFilter {
 
 export async function fetchMessages(filter: MessageFilter): Promise<MessagesResponse> {
   const { status, src_network, dest_network, limit = 10 } = filter;
-  const url = `${BASE_URL}/messages?status=${status}&src_network=${src_network}&dest_network=${dest_network}&limit=${limit}`;
+  const url = `${BASE_URL}/api/messages?status=${status}&limit=${limit}`;
   const response = await serverFetch(url);
   return response.json();
 }
 
 export async function fetchMessageById(id: number): Promise<MessageByIdResponse> {
-  const url = `${BASE_URL}/messages/${id}`;
+  const url = `${BASE_URL}/api/messages/${id}`;
+  const response = await serverFetch(url);
+  return response.json();
+}
+
+export async function fetchStatistics(): Promise<StatisticResponse> {
+  const url = `${BASE_URL}/api/statistic`;
   const response = await serverFetch(url);
   return response.json();
 }
 
 export async function fetchTotalMessages(filter: MessageFilter): Promise<TotalMessagesResponse> {
   const { status, src_network, dest_network } = filter;
-  const url = `${BASE_URL}/statistics/total_messages?status=${status}&src_network=${src_network}&dest_network=${dest_network}`;
+  const url = `${BASE_URL}/api/statistics/total_messages?status=${status}`;
   const response = await serverFetch(url);
   return response.json();
 }
+
+export type { Message, MessageByIdResponse, MessageFilter, MessagesResponse, StatisticResponse, TotalMessagesResponse };

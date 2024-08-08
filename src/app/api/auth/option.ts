@@ -5,7 +5,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import path from 'path'
 
 async function loadUsers(): Promise<User[]> {
-  const usersPath = process.env.USERS_LIST_PATH || path.join(process.cwd(), 'users.json')
+  const usersPath = process.env.NEXT_USERS_LIST_PATH || path.join(process.cwd(), 'users.json')
   const usersJson = await fs.readFile(usersPath, 'utf8')
   const users: User[] = JSON.parse(usersJson)
   return users
