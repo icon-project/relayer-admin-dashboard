@@ -98,8 +98,8 @@ interface StatisticResponse {
 
 enum MessageStatus {
   PENDING = 'pending',
-  CONFIRMED = 'confirmed',
-  FAILED = 'failed',
+  DELIVERED = 'delivered',
+  EXECUTED = 'executed',
   ROLLBACK = 'rollback',
 }
 
