@@ -17,6 +17,12 @@ const nextConfig = {
         port: '3000',
         pathname: '/assets/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'xcallscan.xyz',
+        port: '',
+        pathname: '/_next/**',
+      },
     ],
   },
 }
