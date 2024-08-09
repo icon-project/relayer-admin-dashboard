@@ -38,10 +38,11 @@ const getVariant = (status: string): string => {
 const MessageTable: FC = () => {
   const dict = useDictionary();
   const [messages, setMessages] = useState<Message[]>([]);
+  const [selectedFilter, setSelectedFilter] = useState<string>('executed');
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch('/api/xcall/messages');
+      const response = await fetch(`/api/xcall/messages?status=${selectedFilter}`);
       const messagesResponse: MessagesResponse = await response.json();
       setMessages(messagesResponse.data);
     };
@@ -49,7 +50,11 @@ const MessageTable: FC = () => {
     fetchData();
     const intervalId = setInterval(fetchData, 30000);
     return () => clearInterval(intervalId);
-  }, []);
+  }, [selectedFilter]);
+
+  const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedFilter(event.target.value);
+  };
 
   return (
     <div className="table-responsive">
@@ -64,7 +69,14 @@ const MessageTable: FC = () => {
               <FontAwesomeIcon icon={faArrowAltCircleRight} fixedWidth />
               {dict.dashboard.listing.headers.dest_chain}
             </th>
-            <th>{dict.dashboard.listing.headers.status}</th>
+            <th>
+              {dict.dashboard.listing.headers.status}
+              <select value={selectedFilter} onChange={handleFilterChange} className="form-select form-select-sm">
+              <option value="executed">Executed</option>
+        <option value="pending">Pending</option>
+        <option value="delivered">Delivered</option>
+      </select>
+            </th>
             <th className="text-center">{dict.dashboard.listing.headers.created}</th>
             <th>{dict.dashboard.listing.headers.last_activity}</th>
             <th aria-label="Action"> Action</th>

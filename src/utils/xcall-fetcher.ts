@@ -96,7 +96,7 @@ interface StatisticResponse {
   };
 }
 
-enum MessageStatus {
+export enum MessageStatus {
   PENDING = 'pending',
   DELIVERED = 'delivered',
   EXECUTED = 'executed',
@@ -123,8 +123,9 @@ export async function fetchMessageById(id: number): Promise<MessageByIdResponse>
   return response.json();
 }
 
-export async function fetchStatistics(): Promise<StatisticResponse> {
-  const url = `${BASE_URL}/api/statistic`;
+export async function fetchStatistics(filter: MessageFilter): Promise<StatisticResponse> {
+  const { status, src_network, dest_network } = filter;
+  const url = `${BASE_URL}/api/statistics?status=${status}`;
   const response = await serverFetch(url);
   return response.json();
 }

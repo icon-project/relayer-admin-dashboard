@@ -1,15 +1,33 @@
 import EventEmitter from 'events';
 import { createConnection, Socket } from 'net';
 
-interface Packet {
-  id: string;
-  event: string;
-  data: any;
+enum Event {
+  GetBlock = 'GetBlock',
+  GetMessageList = 'GetMessageList',
+  MessageRemove = 'MessageRemove',
+  RelayMessage = 'RelayMessage',
+  PruneDB = 'PruneDB',
+  RevertMessage = 'RevertMessage',
+  GetFee = 'GetFee',
+  SetFee = 'SetFee',
+  ClaimFee = 'ClaimFee',
+  GetLatestHeight = 'GetLatestHeight',
+  GetLatestProcessedBlock = 'GetLatestProcessedBlock',
+  RelayRangeMessage = 'RelayRangeMessage',
+  GetBlockRange = 'GetBlockRange',
+  GetConfig = 'GetConfig',
+  ListChain = 'ListChain',
 }
 
-interface SocketResponse<T> {
-  status: boolean;
-  data?: T;
+
+interface Packet {
+  id: string;
+  event: Event;
+  data?: any;
+}
+
+interface SocketResponse extends Packet {
+  success: boolean;
   message?: string;
 }
 
@@ -89,7 +107,7 @@ class SocketManager extends EventEmitter {
   private readonly socketPath: string = process.env.NEXT_RELAYER_SOCKET_PATH || '/tmp/relayer.sock';
   private retryCount: number = 0;
   private maxRetries: number = 5;
-  private retryDelay: number = 3000;
+  private retryDelay: number = 9000;
 
   constructor() {
     super();
@@ -99,12 +117,12 @@ class SocketManager extends EventEmitter {
   private connect(): void {
     this.socket = createConnection(this.socketPath, () => {
       console.log('Connected to UNIX domain socket');
-      this.retryCount = 0; // Reset retry count on successful connection
+      this.retryCount = 0;
     });
 
     this.socket.on('data', (data) => {
-      const packet: Packet = JSON.parse(data.toString());
-      this.emit(packet.event, packet);
+      const packet: SocketResponse = JSON.parse(data.toString());
+      this.emit(packet.id, packet);
     });
 
     this.socket.on('error', (err) => {
@@ -129,23 +147,23 @@ class SocketManager extends EventEmitter {
     }
   }
 
-  private sendRequest<T>(event: string, data: any): Promise<SocketResponse<T>> {
+  private sendRequest<T>(event: Event, data?: any): Promise<T> {
     return new Promise((resolve, reject) => {
       const id = this.generateId();
       const packet: Packet = { id, event, data };
 
-      const onResponse = (response: Packet) => {
+      const onResponse = (response: SocketResponse) => {
         if (response.id === id) {
-          this.off(event, onResponse);
-          if (response.data.status) {
-            resolve(response.data);
+          this.off(id, onResponse);
+          if (response.success) {
+            resolve(response?.data);
           } else {
-            reject(new Error(response.data.message));
+            reject(new Error(response.message));
           }
         }
       };
 
-      this.on(event, onResponse);
+      this.on(id, onResponse);
       this.socket?.write(JSON.stringify(packet));
     });
   }
@@ -155,77 +173,77 @@ class SocketManager extends EventEmitter {
   }
 
   // Example method for EventGetBlock
-  public async getBlock(chain: string, all: boolean): Promise<SocketResponse<BlockResponse>> {
+  public async getBlock(chain: string, all: boolean): Promise<BlockResponse> {
     const data = { chain, all };
-    return this.sendRequest<BlockResponse>('EventGetBlock', data);
+    return this.sendRequest<BlockResponse>(Event.GetBlock, data);
   }
 
-  public async getMessageList(chain: string, pagination: any): Promise<SocketResponse<MessageListResponse>> {
+  public async getMessageList(chain: string, pagination: any): Promise<MessageListResponse> {
     const data = { chain, pagination };
-    return this.sendRequest<MessageListResponse>('EventGetMessageList', data);
+    return this.sendRequest<MessageListResponse>(Event.GetMessageList, data);
   }
 
-  public async removeMessage(chain: string, sn: number): Promise<SocketResponse<RemoveMessageResponse>> {
+  public async removeMessage(chain: string, sn: number): Promise<RemoveMessageResponse> {
     const data = { chain, sn };
-    return this.sendRequest<RemoveMessageResponse>('EventMessageRemove', data);
+    return this.sendRequest<RemoveMessageResponse>(Event.MessageRemove, data);
   }
 
-  public async relayMessage(chain: string, sn: number, height: number): Promise<SocketResponse<RelayMessageResponse>> {
+  public async relayMessage(chain: string, sn: number, height: number): Promise<RelayMessageResponse> {
     const data = { chain, sn, height };
-    return this.sendRequest<RelayMessageResponse>('EventRelayMessage', data);
+    return this.sendRequest<RelayMessageResponse>(Event.RelayMessage, data);
   }
 
-  public async pruneDB(): Promise<SocketResponse<PruneDBResponse>> {
-    return this.sendRequest<PruneDBResponse>('EventPruneDB', {});
+  public async pruneDB(): Promise<PruneDBResponse> {
+    return this.sendRequest<PruneDBResponse>(Event.PruneDB);
   }
 
-  public async revertMessage(chain: string, sn: number): Promise<SocketResponse<RevertMessageResponse>> {
+  public async revertMessage(chain: string, sn: number): Promise<RevertMessageResponse> {
     const data = { chain, sn };
-    return this.sendRequest<RevertMessageResponse>('EventRevertMessage', data);
+    return this.sendRequest<RevertMessageResponse>(Event.RevertMessage, data);
   }
 
-  public async getFee(chain: string, network: string, response: boolean): Promise<SocketResponse<GetFeeResponse>> {
+  public async getFee(chain: string, network: string, response: boolean): Promise<GetFeeResponse> {
     const data = { chain, network, response };
-    return this.sendRequest<GetFeeResponse>('EventGetFee', data);
+    return this.sendRequest<GetFeeResponse>(Event.GetFee, data);
   }
 
-  public async setFee(chain: string, network: string, msgFee: number, resFee: number): Promise<SocketResponse<SetFeeResponse>> {
+  public async setFee(chain: string, network: string, msgFee: number, resFee: number): Promise<SetFeeResponse> {
     const data = { chain, network, msgFee, resFee };
-    return this.sendRequest<SetFeeResponse>('EventSetFee', data);
+    return this.sendRequest<SetFeeResponse>(Event.SetFee, data);
   }
 
-  public async claimFee(chain: string): Promise<SocketResponse<ClaimFeeResponse>> {
+  public async claimFee(chain: string): Promise<ClaimFeeResponse> {
     const data = { chain };
-    return this.sendRequest<ClaimFeeResponse>('EventClaimFee', data);
+    return this.sendRequest<ClaimFeeResponse>(Event.ClaimFee, data);
   }
 
-  public async getLatestHeight(chain: string): Promise<SocketResponse<ChainHeightResponse>> {
+  public async getLatestHeight(chain: string): Promise<ChainHeightResponse> {
     const data = { chain };
-    return this.sendRequest<ChainHeightResponse>('EventGetLatestHeight', data);
+    return this.sendRequest<ChainHeightResponse>(Event.GetLatestHeight, data);
   }
 
-  public async getLatestProcessedBlock(chain: string): Promise<SocketResponse<ProcessedBlockResponse>> {
+  public async getLatestProcessedBlock(chain: string): Promise<ProcessedBlockResponse> {
     const data = { chain };
-    return this.sendRequest<ProcessedBlockResponse>('EventGetLatestProcessedBlock', data);
+    return this.sendRequest<ProcessedBlockResponse>(Event.GetLatestProcessedBlock, data);
   }
 
-  public async relayRangeMessage(chain: string, fromHeight: number, toHeight: number): Promise<SocketResponse<RelayRangeMessageResponse>> {
+  public async relayRangeMessage(chain: string, fromHeight: number, toHeight: number): Promise<RelayRangeMessageResponse> {
     const data = { chain, fromHeight, toHeight };
-    return this.sendRequest<RelayRangeMessageResponse>('EventRelayRangeMessage', data);
+    return this.sendRequest<RelayRangeMessageResponse>(Event.RelayRangeMessage, data);
   }
 
-  public async getBlockRange(chain: string, fromHeight: number, toHeight: number): Promise<SocketResponse<BlockRangeResponse>> {
+  public async getBlockRange(chain: string, fromHeight: number, toHeight: number): Promise<BlockRangeResponse> {
     const data = { chain, fromHeight, toHeight };
-    return this.sendRequest<BlockRangeResponse>('EventGetBlockRange', data);
+    return this.sendRequest<BlockRangeResponse>(Event.GetBlockRange, data);
   }
 
-  public async getConfig(chain: string): Promise<SocketResponse<ConfigResponse>> {
+  public async getConfig(chain: string): Promise<ConfigResponse> {
     const data = { chain };
-    return this.sendRequest<ConfigResponse>('EventGetConfig', data);
+    return this.sendRequest<ConfigResponse>(Event.GetConfig, data);
   }
 
-  public async listChains(): Promise<SocketResponse<ChainsListResponse>> {
-    return this.sendRequest<ChainsListResponse>('EventListChain', {});
+  public async listChains(): Promise<ChainsListResponse> {
+    return this.sendRequest<ChainsListResponse>(Event.ListChain);
   }
 }
 
