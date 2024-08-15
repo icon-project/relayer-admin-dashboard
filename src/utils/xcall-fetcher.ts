@@ -2,7 +2,7 @@ import 'server-only';
 
 import serverFetch from './server-fetch';
 
-const BASE_URL = process.env.NEXT_XCALLSCAN_BASE_URL;
+const BASE_URL = process.env.NEXT_XCALLSCAN_BASE_URL || 'https://xcallscan.com/api';
 
 interface Message {
   id: number;
@@ -33,10 +33,15 @@ interface Message {
 
 interface MessagesResponse {
   data: Message[];
-  pagination: {
-    total: number;
-    size: number;
-    number: number;
+  meta: {
+    pagination: {
+      total: number;
+      size: number;
+      number: number;
+    };
+    urls: {
+      tx: Record<string, string>;
+    };
   };
   time: number;
 }
@@ -107,32 +112,33 @@ interface MessageFilter {
   status?: MessageStatus;
   src_network?: string;
   dest_network?: string;
+  skip?: number;
   limit?: number;
 }
 
 export async function fetchMessages(filter: MessageFilter): Promise<MessagesResponse> {
   const { status, src_network, dest_network, limit = 10 } = filter;
-  const url = `${BASE_URL}/api/messages?status=${status}&limit=${limit}`;
+  const url = `${BASE_URL}/messages?status=${status}&limit=${limit}&src_network=${src_network}&dest_network=${dest_network}&skip=${filter.skip || 0}`;
   const response = await serverFetch(url);
   return response.json();
 }
 
 export async function fetchMessageById(id: number): Promise<MessageByIdResponse> {
-  const url = `${BASE_URL}/api/messages/${id}`;
+  const url = `${BASE_URL}/messages/${id}`;
   const response = await serverFetch(url);
   return response.json();
 }
 
 export async function fetchStatistics(filter: MessageFilter): Promise<StatisticResponse> {
   const { status, src_network, dest_network } = filter;
-  const url = `${BASE_URL}/api/statistics?status=${status}`;
+  const url = `${BASE_URL}/statistics?status=${status}`;
   const response = await serverFetch(url);
   return response.json();
 }
 
 export async function fetchTotalMessages(filter: MessageFilter): Promise<TotalMessagesResponse> {
   const { status, src_network, dest_network } = filter;
-  const url = `${BASE_URL}/api/statistics/total_messages?status=${status}`;
+  const url = `${BASE_URL}/statistics/total_messages?status=${status}`;
   const response = await serverFetch(url);
   return response.json();
 }

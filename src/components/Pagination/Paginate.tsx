@@ -7,10 +7,11 @@ import ReactPaginate from 'react-paginate'
 type Props = {
   currentPage: number;
   lastPage: number;
+  onPageChange: (selectedItem: { selected: number }) => void;
 }
 
 export default function Paginate(props: Props) {
-  const { currentPage, lastPage } = props
+  const { currentPage, lastPage, onPageChange } = props
   const [pageIndex, setPageIndex] = useState(currentPage - 1)
   const router = useRouter()
   const pathname = usePathname()
@@ -40,14 +41,7 @@ export default function Paginate(props: Props) {
         nextLabel="›"
         activeClassName="active"
         disabledClassName="disabled"
-        onPageChange={(selectedItem) => {
-          const page = selectedItem.selected + 1
-
-          const newSearchParams = new URLSearchParams(searchParams)
-          newSearchParams.set('page', page.toString())
-
-          router.push(`${pathname}?${newSearchParams}`)
-        }}
+        onPageChange={onPageChange}
       />
     </div>
   )

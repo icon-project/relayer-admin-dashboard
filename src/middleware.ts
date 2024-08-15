@@ -7,7 +7,8 @@ import { NextMiddlewareResult } from 'next/dist/server/web/types'
 import { NextRequest, NextResponse, type NextFetchEvent } from 'next/server'
 
 export default async function middleware(request: NextRequest, event: NextFetchEvent) {
-  const headers = { 'accept-language': request.headers.get('accept-language') ?? '' }
+  const acceptLanguage = request.headers.get('accept-language') ?? ''
+  const headers = { 'accept-language': acceptLanguage === '*' ? 'en' : acceptLanguage }
   const languages = new Negotiator({ headers }).languages()
   const locales = getLocales()
 
@@ -17,14 +18,11 @@ export default async function middleware(request: NextRequest, event: NextFetchE
     response.cookies.set('locale', locale)
   }
 
-  /*
-   * Match all request paths except for the ones starting with:
-   * - login
-   * - register
-   */
-  if (![
+  const excludedPaths = [
     '/login',
-  ].includes(request.nextUrl.pathname)) {
+  ]
+
+  if (excludedPaths.includes(request.nextUrl.pathname)) {
     const res: NextMiddlewareResult = await withAuth(
       // Response with local cookies
       () => response,

@@ -1,5 +1,6 @@
 'use client'
 
+import Loading from '@/components/Loading/Loading';
 import useComputedStyle from '@/hooks/use-computed-style';
 import useDictionary from '@/locales/dictionary-hook';
 import { SystemMetrics } from '@/utils/metrics';
@@ -15,7 +16,6 @@ import {
 } from 'chart.js';
 import { FC, useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
-
 interface UtilizationChartProps {
   metrics: SystemMetrics[] | null;
 }
@@ -37,7 +37,7 @@ const UtilizationChart: FC<UtilizationChartProps> = ({ metrics }) => {
   const bodyColor = useComputedStyle('--bs-body-color');
 
   if (!metrics || metrics.length === 0) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   const labels = metrics.map(metric => formatTimestamp(metric.timestamp));

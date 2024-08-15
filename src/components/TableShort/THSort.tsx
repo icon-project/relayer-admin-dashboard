@@ -1,9 +1,9 @@
 'use client'
 
-import React, { PropsWithChildren } from 'react'
 import { faSort, faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { PropsWithChildren } from 'react'
 
 type Props = {
   name: string;

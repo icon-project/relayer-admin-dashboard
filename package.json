@@ -15,6 +15,7 @@
     "@fortawesome/free-regular-svg-icons": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@nextui-org/table": "^2.0.39",
     "@popperjs/core": "^2.11.8",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.3",
@@ -38,7 +39,7 @@
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",
     "@types/negotiator": "^0.6.3",
-    "@types/node": "^20.14.12",
+    "@types/node": "^22.2.0",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^6.21.0",

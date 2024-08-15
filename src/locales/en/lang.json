@@ -45,6 +45,9 @@
     "auto": "Auto"
   },
   "dashboard": {
+    "action": {
+        "reset": "Reset"
+    },
     "featured": {
       "user": "Users",
       "income": "Income",
@@ -102,6 +105,10 @@
         "pending": "Pending",
         "delivered": "Delivered",
         "executed": "Executed"
+      },
+      "actions" : {
+        "view": "View Details",
+        "execute": "Execute"
       }
     },
     "listing": {
@@ -111,10 +118,6 @@
         "status": "Status",
         "created": "Created",
         "last_activity": "Activity"
-      },
-      "user_status": {
-        "new": "New",
-        "recurring": "Recurring"
       },
       "registered": "Registered",
       "last_login": "Last login",

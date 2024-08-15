@@ -1,9 +1,13 @@
+import Loading from '@/components/Loading/Loading'
 import MessageTable from "@/components/Page/Dashboard/MessageTable"
 import UtilizationChartContainer from '@/components/Page/Dashboard/UtilizationChart'
 import XcallStats from "@/components/Page/Dashboard/XcallStats"
+import { Suspense } from 'react'
+
 
 import { getDictionary } from '@/locales/dictionary'
 import fetchMetrics, { SystemMetrics } from '@/utils/metrics'
+import { socketManager } from '@/utils/socket-fetch'
 import {
   faEllipsisVertical,
   faWallet
@@ -24,23 +28,27 @@ import {
 export default async function Page() {
   const dict = await getDictionary()
   let metrics: SystemMetrics = await fetchMetrics()
+  let chains = await socketManager.listChains()
 
   return (
-    <>
+    <Suspense fallback={<Loading />}>
       <div className="row">
-        <div className="col-sm-6 col-lg-3">
+        { chains.map((chain) => (
+        <div className="col-sm-6 col-lg-3 justify-content-center" key={chain.nid}>
           <Card bg="primary" text="white" className="mb-4">
             <CardBody className="pb-0 d-flex justify-content-between align-items-start">
               <div>
                 <div className="fs-4 fw-semibold">
-                  26K
+                  {chain.name} <span className="fs-6 ms-2 fw-normal">({chain.type})</span>
+                </div>
+                <div>
+                  {chain.nid}
                   <span className="fs-6 ms-2 fw-normal">
-                    (-12.4%
+                    (0.23
                     <FontAwesomeIcon icon={faWallet} fixedWidth />
                     )
                   </span>
                 </div>
-                <div>{dict.dashboard.featured.user}</div>
               </div>
               <Dropdown align="end">
                 <DropdownToggle
@@ -52,12 +60,13 @@ export default async function Page() {
                   <FontAwesomeIcon fixedWidth icon={faEllipsisVertical} />
                 </DropdownToggle>
                 <DropdownMenu>
-                  <DropdownItem href="#/action-1">{dict.dashboard.featured.action.action1}</DropdownItem>
+                  <DropdownItem href="#/action-1">{dict.dashboard.action.reset}</DropdownItem>
                 </DropdownMenu>
               </Dropdown>
             </CardBody>
           </Card>
-        </div>
+          </div>
+          ))}
       </div>
 
       <Card className="mb-4">
@@ -124,6 +133,6 @@ export default async function Page() {
           </Card>
         </div>
       </div>
-    </>
+    </Suspense>
   )
 }

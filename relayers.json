@@ -1,0 +1,9 @@
+[{
+  "id": "lydialabs",
+  "name": "LydiaLabs",
+  "host": "https://lydialabs.com",
+  "auth": {
+    "username": "lydialabs",
+    "password": "lydialabs"
+  }
+}]

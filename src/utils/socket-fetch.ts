@@ -16,7 +16,8 @@ enum Event {
   RelayRangeMessage = 'RelayRangeMessage',
   GetBlockRange = 'GetBlockRange',
   GetConfig = 'GetConfig',
-  ListChain = 'ListChain',
+  ListChainInfo = 'ListChainInfo',
+  GetChainBalance = 'GetChainBalance',
 }
 
 
@@ -98,8 +99,20 @@ type ConfigResponse = {
   config: any;
 };
 
-type ChainsListResponse = {
-  chains: string[];
+type ChainInfoResponse = {
+  name: string;
+  nid: string;
+  type: string;
+  address: string;
+};
+
+type ChainBalanceResponse = {
+  chain: string;
+  address: string;
+  balance: {
+    amount: number;
+    denom: string;
+  };
 };
 
 class SocketManager extends EventEmitter {
@@ -115,21 +128,26 @@ class SocketManager extends EventEmitter {
   }
 
   private connect(): void {
+    if (this.socket) {
+      this.socket.removeAllListeners();
+      this.socket.destroy
+    }
     this.socket = createConnection(this.socketPath, () => {
       console.log('Connected to UNIX domain socket');
       this.retryCount = 0;
     });
-
-    this.socket.on('data', (data) => {
-      const packet: SocketResponse = JSON.parse(data.toString());
-      this.emit(packet.id, packet);
+    this.socket.on('data' , (data) => {
+      try {
+        const response: SocketResponse = JSON.parse(data.toString());
+        this.emit(response.id, response);
+      } catch (error) {
+        console.error('Failed to parse socket response:', error);
+      }
     });
-
     this.socket.on('error', (err) => {
       console.error('Socket error:', err);
       this.retryConnection();
     });
-
     this.socket.on('close', () => {
       console.log('Socket closed');
       this.retryConnection();
@@ -137,7 +155,7 @@ class SocketManager extends EventEmitter {
   }
 
   private retryConnection(): void {
-    if (this.retryCount < this.maxRetries) {
+    if (this.maxRetries === 0 || this.retryCount < this.maxRetries) {
       setTimeout(() => {
         this.retryCount++;
         this.connect();
@@ -242,8 +260,13 @@ class SocketManager extends EventEmitter {
     return this.sendRequest<ConfigResponse>(Event.GetConfig, data);
   }
 
-  public async listChains(): Promise<ChainsListResponse> {
-    return this.sendRequest<ChainsListResponse>(Event.ListChain);
+  public async listChains(): Promise<ChainInfoResponse[]> {
+    return this.sendRequest<ChainInfoResponse[]>(Event.ListChainInfo);
+  }
+
+  public async getChainBalance(chain: string, address: string): Promise<ChainBalanceResponse> {
+    const data = { chain, address };
+    return this.sendRequest<ChainBalanceResponse>(Event.GetChainBalance, data);
   }
 }
 
