@@ -1,19 +1,15 @@
 import EventEmitter from 'events';
 import { createConnection, Socket } from 'net';
 
-enum Event {
+export enum Event {
   GetBlock = 'GetBlock',
   GetMessageList = 'GetMessageList',
   MessageRemove = 'MessageRemove',
   RelayMessage = 'RelayMessage',
   PruneDB = 'PruneDB',
-  RevertMessage = 'RevertMessage',
   GetFee = 'GetFee',
-  SetFee = 'SetFee',
   ClaimFee = 'ClaimFee',
   GetLatestHeight = 'GetLatestHeight',
-  GetLatestProcessedBlock = 'GetLatestProcessedBlock',
-  RelayRangeMessage = 'RelayRangeMessage',
   GetBlockRange = 'GetBlockRange',
   GetConfig = 'GetConfig',
   ListChainInfo = 'ListChainInfo',
@@ -27,22 +23,22 @@ interface Packet {
   data?: any;
 }
 
-interface SocketResponse extends Packet {
+export interface SocketResponse extends Packet {
   success: boolean;
   message?: string;
 }
 
-type BlockResponse = {
+export interface BlockResponse {
   chain: string;
   height: number;
 };
 
-type MessageListResponse = {
+export interface MessageListResponse {
   messages: any[];
   total: number;
 };
 
-type RemoveMessageResponse = {
+export interface RemoveMessageResponse {
   sn: number;
   chain: string;
   dst: string;
@@ -50,63 +46,78 @@ type RemoveMessageResponse = {
   eventType: string;
 };
 
-type RelayMessageResponse = {
-  message: any;
+export interface RelayMessageResponse {
+  sn: number;
+  src: string;
+  dst: string;
+  eventType?: string;
+  height: number;
+  reqId?: string;
 };
 
-type PruneDBResponse = {
+export interface PruneDBResponse {
   status: string;
 };
 
-type RevertMessageResponse = {
+export interface RevertMessageResponse {
   sn: number;
 };
 
-type GetFeeResponse = {
+export interface GetFeeResponse {
   chain: string;
   fee: number;
 };
 
-type SetFeeResponse = {
+export interface SetFeeResponse {
   status: string;
 };
 
-type ClaimFeeResponse = {
+export interface ClaimFeeResponse {
   status: string;
 };
 
-type ChainHeightResponse = {
+export interface ChainHeightResponse {
   chain: string;
   height: number;
 };
 
-type ProcessedBlockResponse = {
+export interface ProcessedBlockResponse {
   chain: string;
   height: number;
 };
 
-type RelayRangeMessageResponse = {
+export interface RelayRangeMessageResponse {
   chain: string;
   messages: any[];
 };
 
-type BlockRangeResponse = {
+export interface BlockRangeResponse {
   chain: string;
   msgs: any[];
 };
 
-type ConfigResponse = {
+export interface ConfigResponse {
   config: any;
 };
 
-type ChainInfoResponse = {
+export interface ChainInfoResponse {
   name: string;
   nid: string;
   type: string;
   address: string;
+  lastHeight: number;
+  lastCheckPoint: number
+  contracts: {
+    xcall?: string;
+    connection?: string;
+  }
+  balance?: {
+    amount: number;
+    denom: string;
+  };
 };
 
-type ChainBalanceResponse = {
+export interface ChainBalanceResponse {
   chain: string;
   address: string;
   balance: {
@@ -115,12 +126,19 @@ type ChainBalanceResponse = {
   };
 };
 
+export interface RequestBalance {
+  chain: string;
+  address: string;
+}
+
 class SocketManager extends EventEmitter {
   private socket: Socket | null = null;
   private readonly socketPath: string = process.env.NEXT_RELAYER_SOCKET_PATH || '/tmp/relayer.sock';
   private retryCount: number = 0;
   private maxRetries: number = 5;
   private retryDelay: number = 9000;
+
+  private isConnected: boolean = false;
 
   constructor() {
     super();
@@ -130,7 +148,7 @@ class SocketManager extends EventEmitter {
   private connect(): void {
     if (this.socket) {
       this.socket.removeAllListeners();
-      this.socket.destroy
+      this.socket.destroy();
     }
     this.socket = createConnection(this.socketPath, () => {
       console.log('Connected to UNIX domain socket');
@@ -190,7 +208,6 @@ class SocketManager extends EventEmitter {
     return Math.random().toString(36).substring(2, 8);
   }
 
-  // Example method for EventGetBlock
   public async getBlock(chain: string, all: boolean): Promise<BlockResponse> {
     const data = { chain, all };
     return this.sendRequest<BlockResponse>(Event.GetBlock, data);
@@ -206,8 +223,8 @@ class SocketManager extends EventEmitter {
     return this.sendRequest<RemoveMessageResponse>(Event.MessageRemove, data);
   }
 
-  public async relayMessage(chain: string, sn: number, height: number): Promise<RelayMessageResponse> {
-    const data = { chain, sn, height };
+  public async relayMessage(chain: string, fromHeight: number, toHeight?: number): Promise<RelayMessageResponse> {
+    const data = { chain, fromHeight, toHeight };
     return this.sendRequest<RelayMessageResponse>(Event.RelayMessage, data);
   }
 
@@ -215,19 +232,9 @@ class SocketManager extends EventEmitter {
     return this.sendRequest<PruneDBResponse>(Event.PruneDB);
   }
 
-  public async revertMessage(chain: string, sn: number): Promise<RevertMessageResponse> {
-    const data = { chain, sn };
-    return this.sendRequest<RevertMessageResponse>(Event.RevertMessage, data);
-  }
-
   public async getFee(chain: string, network: string, response: boolean): Promise<GetFeeResponse> {
     const data = { chain, network, response };
     return this.sendRequest<GetFeeResponse>(Event.GetFee, data);
-  }
-
-  public async setFee(chain: string, network: string, msgFee: number, resFee: number): Promise<SetFeeResponse> {
-    const data = { chain, network, msgFee, resFee };
-    return this.sendRequest<SetFeeResponse>(Event.SetFee, data);
   }
 
   public async claimFee(chain: string): Promise<ClaimFeeResponse> {
@@ -240,16 +247,6 @@ class SocketManager extends EventEmitter {
     return this.sendRequest<ChainHeightResponse>(Event.GetLatestHeight, data);
   }
 
-  public async getLatestProcessedBlock(chain: string): Promise<ProcessedBlockResponse> {
-    const data = { chain };
-    return this.sendRequest<ProcessedBlockResponse>(Event.GetLatestProcessedBlock, data);
-  }
-
-  public async relayRangeMessage(chain: string, fromHeight: number, toHeight: number): Promise<RelayRangeMessageResponse> {
-    const data = { chain, fromHeight, toHeight };
-    return this.sendRequest<RelayRangeMessageResponse>(Event.RelayRangeMessage, data);
-  }
-
   public async getBlockRange(chain: string, fromHeight: number, toHeight: number): Promise<BlockRangeResponse> {
     const data = { chain, fromHeight, toHeight };
     return this.sendRequest<BlockRangeResponse>(Event.GetBlockRange, data);
@@ -260,13 +257,12 @@ class SocketManager extends EventEmitter {
     return this.sendRequest<ConfigResponse>(Event.GetConfig, data);
   }
 
-  public async listChains(): Promise<ChainInfoResponse[]> {
-    return this.sendRequest<ChainInfoResponse[]>(Event.ListChainInfo);
+  public async listChains(chains?: string[]): Promise<ChainInfoResponse[]> {
+    return this.sendRequest<ChainInfoResponse[]>(Event.ListChainInfo, chains);
   }
 
-  public async getChainBalance(chain: string, address: string): Promise<ChainBalanceResponse> {
-    const data = { chain, address };
-    return this.sendRequest<ChainBalanceResponse>(Event.GetChainBalance, data);
+  public async getChainBalance(chains: RequestBalance[]): Promise<ChainBalanceResponse[]> {
+    return this.sendRequest<ChainBalanceResponse[]>(Event.GetChainBalance, chains);
   }
 }
 

@@ -29,6 +29,14 @@ export default async function Page() {
   const dict = await getDictionary()
   let metrics: SystemMetrics = await fetchMetrics()
   let chains = await socketManager.listChains()
+  let balance = await socketManager.getChainBalance(chains.map((chain) => ({ chain: chain.nid, address: chain.address })))
+  chains = chains.map((chain) => {
+    let chainBalance = balance.find((b) => b.chain === chain.nid)
+    return {
+      ...chain,
+      balance: chainBalance?.balance
+    }
+  })
 
   return (
     <Suspense fallback={<Loading />}>
@@ -44,7 +52,7 @@ export default async function Page() {
                 <div>
                   {chain.nid}
                   <span className="fs-6 ms-2 fw-normal">
-                    (0.23
+                    ({chain.balance?.amount} {chain.balance?.denom}{' '}
                     <FontAwesomeIcon icon={faWallet} fixedWidth />
                     )
                   </span>
@@ -61,6 +69,7 @@ export default async function Page() {
                 </DropdownToggle>
                 <DropdownMenu>
                   <DropdownItem href="#/action-1">{dict.dashboard.action.reset}</DropdownItem>
+                  <DropdownItem href="#/action-1">{dict.dashboard.action.view}</DropdownItem>
                 </DropdownMenu>
               </Dropdown>
             </CardBody>
@@ -112,7 +121,7 @@ export default async function Page() {
               <ProgressBar
                 className="progress-thin mt-2"
                 variant="primary"
-                now={1}
+                now={0.5}
               />
             </div>
           </div>
