@@ -7,5 +7,7 @@
 			"path": "../centralized-relay"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"terminal.integrated.splitCwd": "workspaceRoot"
+	}
 }

@@ -71,6 +71,7 @@
       },
       "actions" : {
         "view": "View Details",
+        "deliver": "Deliver",
         "execute": "Execute"
       }
     },
@@ -79,13 +80,8 @@
         "src_chain": "Source",
         "dest_chain": "Dest",
         "status": "Status",
-        "created": "Created",
-        "last_activity": "Activity"
-      },
-      "registered": "Registered",
-      "last_login": "Last login",
-      "usage_duration": "Jun 11, 2020 - Jul 10, 2020",
-      "registered_at": "Jan 1, 2020"
+        "created": "Created"
+      }
     }
   },
   "relayer": {
@@ -186,6 +182,7 @@
   },
   "sidebar": {
     "items": {
+      "others": "Others",
       "dashboard": "Dashboard",
       "relayers": "Relayers",
       "docs": "Docs"

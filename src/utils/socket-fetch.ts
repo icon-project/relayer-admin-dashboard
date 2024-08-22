@@ -2,6 +2,7 @@ import EventEmitter from 'events';
 import { createConnection, Socket } from 'net';
 
 export enum Event {
+  Metrics = 'Metrics',
   GetBlock = 'GetBlock',
   GetMessageList = 'GetMessageList',
   MessageRemove = 'MessageRemove',
@@ -38,13 +39,11 @@ export interface MessageListResponse {
   total: number;
 };
 
-export interface RemoveMessageResponse {
-  sn: number;
+export interface RelayMessage {
   chain: string;
-  dst: string;
-  messageHeight: number;
-  eventType: string;
-};
+  fromHeight: number;
+  toHeight?: number;
+}
 
 export interface RelayMessageResponse {
   sn: number;
@@ -62,6 +61,12 @@ export interface PruneDBResponse {
 export interface RevertMessageResponse {
   sn: number;
 };
+
+export interface GetFee {
+  chain: string;
+  network: string;
+  response: boolean;
+}
 
 export interface GetFeeResponse {
   chain: string;
@@ -81,20 +86,15 @@ export interface ChainHeightResponse {
   height: number;
 };
 
-export interface ProcessedBlockResponse {
+export interface GetBalance {
   chain: string;
-  height: number;
-};
+  address: string;
+}
 
-export interface RelayRangeMessageResponse {
+export interface MessageReceived {
   chain: string;
-  messages: any[];
-};
-
-export interface BlockRangeResponse {
-  chain: string;
-  msgs: any[];
-};
+  sn: number;
+}
 
 export interface ConfigResponse {
   config: any;
@@ -136,9 +136,7 @@ class SocketManager extends EventEmitter {
   private readonly socketPath: string = process.env.NEXT_RELAYER_SOCKET_PATH || '/tmp/relayer.sock';
   private retryCount: number = 0;
   private maxRetries: number = 5;
-  private retryDelay: number = 9000;
-
-  private isConnected: boolean = false;
+  private baseRetryDelay: number = 3000;
 
   constructor() {
     super();
@@ -174,10 +172,11 @@ class SocketManager extends EventEmitter {
 
   private retryConnection(): void {
     if (this.maxRetries === 0 || this.retryCount < this.maxRetries) {
+      const backoffDelay = Math.pow(2, this.retryCount) * this.baseRetryDelay;
       setTimeout(() => {
         this.retryCount++;
         this.connect();
-      }, this.retryDelay);
+      }, backoffDelay);
     } else {
       console.error('Max retries reached. Could not connect to socket.');
     }
@@ -218,13 +217,8 @@ class SocketManager extends EventEmitter {
     return this.sendRequest<MessageListResponse>(Event.GetMessageList, data);
   }
 
-  public async removeMessage(chain: string, sn: number): Promise<RemoveMessageResponse> {
-    const data = { chain, sn };
-    return this.sendRequest<RemoveMessageResponse>(Event.MessageRemove, data);
-  }
-
   public async relayMessage(chain: string, fromHeight: number, toHeight?: number): Promise<RelayMessageResponse> {
-    const data = { chain, fromHeight, toHeight };
+    const data: RelayMessage = { chain, fromHeight, toHeight };
     return this.sendRequest<RelayMessageResponse>(Event.RelayMessage, data);
   }
 
@@ -245,11 +239,6 @@ class SocketManager extends EventEmitter {
   public async getLatestHeight(chain: string): Promise<ChainHeightResponse> {
     const data = { chain };
     return this.sendRequest<ChainHeightResponse>(Event.GetLatestHeight, data);
-  }
-
-  public async getBlockRange(chain: string, fromHeight: number, toHeight: number): Promise<BlockRangeResponse> {
-    const data = { chain, fromHeight, toHeight };
-    return this.sendRequest<BlockRangeResponse>(Event.GetBlockRange, data);
   }
 
   public async getConfig(chain: string): Promise<ConfigResponse> {

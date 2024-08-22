@@ -1,7 +1,7 @@
 import SidebarNavGroup from '@/components/Layout/Dashboard/Sidebar/SidebarNavGroup'
 import SidebarNavItem from '@/components/Layout/Dashboard/Sidebar/SidebarNavItem'
 import { getDictionary } from '@/locales/dictionary'
-import { loadRelayer } from '@/utils/proxy'
+import { getAvailableRelayers } from '@/utils/relayer'
 import {
   faFileLines
 } from '@fortawesome/free-regular-svg-icons'
@@ -18,7 +18,7 @@ const SidebarNavTitle = (props: PropsWithChildren) => {
 
 export default async function SidebarNav() {
   const dict = await getDictionary()
-  const relayers = await loadRelayer()
+  const relayers = await getAvailableRelayers()
   return (
     <ul className="list-unstyled">
       <SidebarNavItem icon={faGauge} href="/">
@@ -26,12 +26,10 @@ export default async function SidebarNav() {
       </SidebarNavItem>
       <SidebarNavGroup toggleIcon={faPuzzlePiece} toggleText={dict.sidebar.items.relayers}>
       {relayers.map((relayer) => (
-          <SidebarNavItem key={relayer.id} href={`/relayer/${relayer.id}`}>
-            {relayer.name}
-          </SidebarNavItem>
+          <SidebarNavItem key={relayer.id} href={`/relayer/${relayer.id}`}>{relayer.name}</SidebarNavItem>
       ))}
       </SidebarNavGroup>
-      <SidebarNavTitle>{dict.sidebar.items.extras}</SidebarNavTitle>
+      <SidebarNavTitle>{dict.sidebar.items.others}</SidebarNavTitle>
       <SidebarNavItem icon={faFileLines} href="https://github.com/icon-project/centralized-relay/wiki/">{dict.sidebar.items.docs}</SidebarNavItem>
     </ul>
   )

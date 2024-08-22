@@ -59,7 +59,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
           height="46"
         >
           <title>Centralized Relay</title>
-          <use xlinkHref="/assets/brand/icon-foundation.svg#signet" />
+          <use xlinkHref="/assets/brand/icon-foundation.svg" />
         </svg>
       </div>
 

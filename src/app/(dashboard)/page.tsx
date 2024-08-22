@@ -2,9 +2,6 @@ import Loading from '@/components/Loading/Loading'
 import MessageTable from "@/components/Page/Dashboard/MessageTable"
 import UtilizationChartContainer from '@/components/Page/Dashboard/UtilizationChart'
 import XcallStats from "@/components/Page/Dashboard/XcallStats"
-import { Suspense } from 'react'
-
-
 import { getDictionary } from '@/locales/dictionary'
 import fetchMetrics, { SystemMetrics } from '@/utils/metrics'
 import { socketManager } from '@/utils/socket-fetch'
@@ -13,6 +10,7 @@ import {
   faWallet
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Suspense } from 'react'
 import {
   Card,
   CardBody,
