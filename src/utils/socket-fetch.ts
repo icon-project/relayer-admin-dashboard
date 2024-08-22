@@ -15,6 +15,8 @@ export enum Event {
   GetConfig = 'GetConfig',
   ListChainInfo = 'ListChainInfo',
   GetChainBalance = 'GetChainBalance',
+
+  GetBlockEvents = 'GetBlockEvents'
 }
 
 
@@ -34,8 +36,19 @@ export interface BlockResponse {
   height: number;
 };
 
+interface Message {
+  src: string;
+  dst: string;
+  retry: number;
+  sn: number;
+  data: any;
+  eventType: string;
+  reqID?: number;
+  messageHeight: number;
+}
+
 export interface MessageListResponse {
-  messages: any[];
+  message: Message[];
   total: number;
 };
 
@@ -131,6 +144,13 @@ export interface RequestBalance {
   address: string;
 }
 
+export interface BlockEvents {
+  chain: string;
+  address: string;
+  event: string[];
+  height: number;
+}
+
 class SocketManager extends EventEmitter {
   private socket: Socket | null = null;
   private readonly socketPath: string = process.env.NEXT_RELAYER_SOCKET_PATH || '/tmp/relayer.sock';
@@ -212,8 +232,8 @@ class SocketManager extends EventEmitter {
     return this.sendRequest<BlockResponse>(Event.GetBlock, data);
   }
 
-  public async getMessageList(chain: string, pagination: any): Promise<MessageListResponse> {
-    const data = { chain, pagination };
+  public async getMessageList(chain: string, limit: number): Promise<MessageListResponse> {
+    const data = { chain, limit };
     return this.sendRequest<MessageListResponse>(Event.GetMessageList, data);
   }
 
@@ -253,6 +273,12 @@ class SocketManager extends EventEmitter {
   public async getChainBalance(chains: RequestBalance[]): Promise<ChainBalanceResponse[]> {
     return this.sendRequest<ChainBalanceResponse[]>(Event.GetChainBalance, chains);
   }
+
+  public async getBlockEvents(chain: string, height: number): Promise<BlockEvents> {
+    const data = { chain, height}
+    return this.sendRequest<BlockEvents>(Event.GetBlockEvents, data);
+  }
+
 }
 
 export const socketManager = new SocketManager()

@@ -100,7 +100,7 @@ async function getRelayerToken(id: string): Promise<RelayerToken> {
 export async function Proxy(request: ProxyRequest) {
   try {
     const relayer = await getCachedRelayerToken(request.relayerId)
-    const url = `${relayer.host}/event?event=${request.event}`
+    const url = `${relayer.host}/event?${new URLSearchParams(request.args).toString()}`
     const response = await serverFetch(url, {
       method: request.method,
       headers: {

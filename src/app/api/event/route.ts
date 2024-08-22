@@ -7,16 +7,16 @@ async function handleEvent(event: Event, body: any, args: Record<string, string>
     case Event.GetBlock:
       const { all } = args
       if (!args.chain) {
-        return Response.json({ error: 'Messing chain params' }, { status: 400 })
+        return Response.json({ error: 'Missing chain params' }, { status: 400 })
       }
       const isAll = (all !== '')
       data = await socketManager.getBlock(args.chain, isAll);
       break;
     case Event.GetMessageList:
       if (!args.chain) {
-        return Response.json({ error: 'Messing chain params' }, { status: 400 })
+        return Response.json({ error: 'Missing chain params' }, { status: 400 })
       }
-      data = await socketManager.getMessageList(args.chain, pagination);
+      data = await socketManager.getMessageList(args.chain, 10);
       break;
     case Event.GetFee:
       if (!args.chain) {
@@ -35,7 +35,7 @@ async function handleEvent(event: Event, body: any, args: Record<string, string>
       break;
     case Event.GetConfig:
       if (!args.chain) {
-        return Response.json({ error: 'Messing chain params' }, { status: 400 })
+        return Response.json({ error: 'Missing chain param' }, { status: 400 })
       }
       data = await socketManager.getConfig(args.chain);
       break;
@@ -47,7 +47,7 @@ async function handleEvent(event: Event, body: any, args: Record<string, string>
       break;
     case Event.RelayMessage:
       if (!args.chain) {
-        return Response.json({ error: 'Messing chain params' }, { status: 400 })
+        return Response.json({ error: 'Missing chain params' }, { status: 400 })
       }
       data = await socketManager.relayMessage(args.chain, body.sn, body.height);
       break;
@@ -56,7 +56,7 @@ async function handleEvent(event: Event, body: any, args: Record<string, string>
       break;
     case Event.ClaimFee:
       if (!args.chain) {
-        return Response.json({ error: 'Messing chain params' }, { status: 400 })
+        return Response.json({ error: 'Missing chain params' }, { status: 400 })
       }
       data = await socketManager.claimFee(args.chain);
       break;
