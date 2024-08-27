@@ -22,7 +22,7 @@ export default async function middleware(request: NextRequest, event: NextFetchE
     '/login',
   ]
 
-  if (excludedPaths.includes(request.nextUrl.pathname)) {
+  if (!excludedPaths.includes(request.nextUrl.pathname)) {
     const res: NextMiddlewareResult = await withAuth(
       // Response with local cookies
       () => response,
