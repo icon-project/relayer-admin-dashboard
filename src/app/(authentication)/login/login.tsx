@@ -60,7 +60,7 @@ export default function Login({ callbackUrl }: { callbackUrl: string }) {
   }
 
   return (
-    <>
+    <div>
       <Alert
         variant="danger"
         show={error !== ''}
@@ -122,6 +122,6 @@ export default function Login({ callbackUrl }: { callbackUrl: string }) {
           </Col>
         </Row>
       </Form>
-    </>
+    </div>
   )
 }

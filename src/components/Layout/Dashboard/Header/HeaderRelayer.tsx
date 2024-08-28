@@ -28,12 +28,18 @@ export default function HeaderRelayer({ currentRelayerId, relayers }: HeaderRela
     router.refresh()
   }
 
+  const deleteSelection = () => {
+    Cookies.remove('relayerId')
+    router.refresh()
+  }
+
   return (
     <Dropdown>
       <DropdownToggle className="px-2 mx-1 px-sm-3 mx-sm-0" as={NavLink} bsPrefix="hide-caret" id="dropdown-locale">
         <FontAwesomeIcon icon={faTowerCell} size="lg" />
       </DropdownToggle>
       <DropdownMenu className="pt-0" align="end">
+        <DropdownItem onClick={deleteSelection}>None</DropdownItem>
         {relayers.map((relayer) => (
           <DropdownItem key={relayer.id} onClick={() => changeRelayer(relayer.id)} active={relayer.id === selectedRelayer}>
             {relayer.name}
