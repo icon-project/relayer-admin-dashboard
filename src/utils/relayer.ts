@@ -1,7 +1,6 @@
 import fs from 'fs/promises';
 import { cookies } from 'next/headers';
 import path from 'path';
-import 'server-only';
 import serverFetch from './server-fetch';
 
 const tokenCache: { [relayerId: string]: CachedToken } = {};
@@ -79,20 +78,22 @@ async function getRelayerToken(id: string): Promise<RelayerToken> {
       email: relayer.auth.email,
       password: relayer.auth.password,
     }
-    const response = await serverFetch(`${relayer.host}/login`, {
+    const response = await serverFetch(`${relayer.host}/api/auth/signin`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(postBody),
     })
+    console.log(await response.text())
     const data = await response.json()
     return {
       id,
       token: data.token,
       host: relayer.host,
     }
-  } catch (error) {
+  } catch (error: any) {
+    console.log(error.message)
     throw new Error('Failed to get relayer token')
   }
 }
@@ -101,6 +102,8 @@ export async function Proxy(request: ProxyRequest) {
   try {
     const relayer = await getCachedRelayerToken(request.relayerId)
     const url = `${relayer.host}/event?${new URLSearchParams(request.args).toString()}`
+    console.log(JSON.stringify(request))
+    console.log(JSON.stringify(relayer))
     const response = await serverFetch(url, {
       method: request.method,
       headers: {
@@ -111,6 +114,7 @@ export async function Proxy(request: ProxyRequest) {
     })
     return response.json()
   } catch (error) {
+    console.log(error);
     throw new Error('Failed to proxy request')
   }
 }

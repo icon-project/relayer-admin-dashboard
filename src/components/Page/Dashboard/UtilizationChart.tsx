@@ -119,7 +119,7 @@ const UtilizationChartContainer: FC = () => {
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
-        const response = await fetch('/api/metrics');
+        const response = await fetch('/api/relayer?event=Metrics');
         const data = await response.json();
         const newMetric = { ...data.data };
 

@@ -1,10 +1,14 @@
+import fetchMetrics from "@/utils/metrics";
 import { Proxy, ProxyRequest } from "@/utils/relayer";
 import { Event, socketManager } from "@/utils/socket-fetch";
+import { cookies } from 'next/headers';
+
 
 async function handler(req: Request): Promise<Response> {
   const url = new URL(req.url);
   const event = url.searchParams.get('event') as Event;
-  const relayerId = url.searchParams.get('relayerId');
+  const cookieStore = cookies();
+  const relayerId = cookieStore.get('relayerId');
 
   if (!event) {
     return Response.json({ error: 'Missing event parameter' }, { status: 400 });
@@ -14,7 +18,7 @@ async function handler(req: Request): Promise<Response> {
 
   if (relayerId) {
     const proxyRequest: ProxyRequest = {
-      relayerId,
+      relayerId: relayerId?.value,
       method: req.method,
       body: req?.body,
     };
@@ -75,6 +79,9 @@ async function handler(req: Request): Promise<Response> {
         case Event.GetChainBalance:
           const chains = await req.json()
           data = await socketManager.getChainBalance(chains);
+          break;
+        case Event.Metrics:
+          data = await fetchMetrics()
           break;
         default:
           return Response.json({ error: 'Invalid event' }, { status: 400 });

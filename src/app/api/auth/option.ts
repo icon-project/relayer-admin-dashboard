@@ -36,17 +36,20 @@ export const authOptions: NextAuthOptions = {
         }
         const { email, password } = credentials
 
-        const users = await loadUsers()
-
-        const user = users.find((u: User) => u.email === email && u.password === password)
-
-        const dict = await getDictionary()
-
-        if (!user) {
-          throw new Error(dict.login.message.auth_failed)
-        }
-        return { ...user, password: null }
+        const data = await authenticate(email, password)
+        return data;
       },
     }),
   ],
+}
+
+export async function authenticate(email: string, password: string): Promise<User> {
+   const users = await loadUsers()
+  const user = users.find((u: User) => u.email === email && u.password === password)
+
+  const dict = await getDictionary()
+  if (!user) {
+    throw new Error(dict.login.message.auth_failed)
+  }
+  return { ...user, password: null }
 }
