@@ -121,10 +121,9 @@ const UtilizationChartContainer: FC = () => {
       try {
         const response = await fetch('/api/relayer?event=Metrics');
         const data = await response.json();
-        const newMetric = { ...data.data };
 
         const savedMetrics = JSON.parse(localStorage.getItem('metrics') || '[]');
-        savedMetrics.push(newMetric);
+        savedMetrics.push(data);
 
         const fifteenMinutesAgo = Date.now() - 15 * 60 * 1000;
         const filteredMetrics = savedMetrics.filter((metric: SystemMetrics) => metric.timestamp >= fifteenMinutesAgo);

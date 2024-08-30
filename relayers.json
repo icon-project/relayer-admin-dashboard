@@ -1,9 +1,9 @@
 [{
   "id": "lydialabs",
   "name": "LydiaLabs",
-  "host": "https://lydialabs.com",
+  "host": "http://localhost:3000",
   "auth": {
-    "username": "lydialabs",
-    "password": "lydialabs"
+    "email": "admin@venture23.io",
+    "password": "password"
   }
 }]
