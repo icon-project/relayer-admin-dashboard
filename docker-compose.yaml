@@ -1,0 +1,28 @@
+services:
+  web:
+    image: iconcommunity/admin-dashboard:latest
+    ports:
+      - 3000:3000
+    volumes:
+      - ./data/relayer:/home/relayer/.centralized-relay
+    networks:
+      - relayer
+    depends_on:
+      - relayer
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./certbot/www/:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:rw
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./data/nginx/conf/:/etc/nginx/conf.d/:ro
+      - ./data/certbot/www/:/var/www/certbot/:ro
+    networks:
+      - relayer
+    depends_on:
+      - web
+
+networks:
+  relayer: {}
