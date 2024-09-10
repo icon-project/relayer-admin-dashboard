@@ -14,8 +14,10 @@ services:
     volumes:
       - ./certbot/www/:/var/www/certbot/:rw
       - ./certbot/conf/:/etc/letsencrypt/:rw
+    entrypoint: /bin/sh -c "trap exit TERM; while :; do sleep 6h & wait $${!}; certbot renew; done"
+
   nginx:
-    image: nginx:latest
+    build: nginx.Dockerfile
     volumes:
       - ./data/nginx/conf/:/etc/nginx/conf.d/:ro
       - ./data/certbot/www/:/var/www/certbot/:ro

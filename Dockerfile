@@ -21,4 +21,4 @@ COPY --from=build-env /usr/src/app/node_modules .
 
 EXPOSE 3000
 
-CMD [ "bun", "out" ]
+CMD [ "bun", "start" ]
