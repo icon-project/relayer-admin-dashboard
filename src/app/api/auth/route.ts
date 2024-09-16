@@ -9,7 +9,7 @@ export async function POST(req: Request): Promise<Response> {
     const user = await authenticate(email, password);
     if (user) {
       const secret = process.env.NEXTAUTH_SECRET;
-      const token = await sign(user, secret);
+      const token = await sign(user, "secret");
       return Response.json({token});
     }
     return Response.json({error: 'failed to login'}, {status: 401 })

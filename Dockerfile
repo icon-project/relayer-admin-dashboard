@@ -19,7 +19,7 @@ RUN bun run build
 
 FROM base AS release
 COPY --from=install /temp/prod/node_modules node_modules
-COPY --from=prerelease /usr/src/app/.next .
+COPY --from=prerelease /usr/src/app/.next .next
 COPY --from=prerelease /usr/src/app/package.json .
 
 USER bun

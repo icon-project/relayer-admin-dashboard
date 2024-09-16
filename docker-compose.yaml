@@ -1,19 +1,29 @@
 services:
   web:
-    image: iconcommunity/admin-dashboard:latest
+    build: .
     ports:
       - 3000:3000
     volumes:
       - ./data/relayer:/home/relayer/.centralized-relay
     networks:
       - relayer
+    environment:
+      - NEXT_PUBLIC_APP_API_ENDPOINT=http://localhost:3000/api
+      - NEXT_PUBLIC_API_RETRY_INTERVAL_IN_SECONDS=5
+      - NEXT_PUBLIC_API_MAX_RETRY=5
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=URyx8rbN9FFymdKY7AkcBT9LhB1b1tGP/cjd4u6ZJs4=
+      - NEXT_XCALLSCAN_BASE_URL=https://xcallscan.xyz/api
+      - NEXT_RELAYER_SOCKET_PATH=/home/relayer/relayer.sock
     depends_on:
       - relayer
   certbot:
     image: certbot/certbot:latest
+    environment:
+      - DOMAIN
     volumes:
-      - ./certbot/www/:/var/www/certbot/:rw
-      - ./certbot/conf/:/etc/letsencrypt/:rw
+      - ./data/certbot/www/:/var/www/certbot/:rw
+      - ./data/certbot/conf/:/etc/letsencrypt/:rw
     entrypoint: /bin/sh -c "trap exit TERM; while :; do sleep 6h & wait $${!}; certbot renew; done"
 
   nginx:
@@ -21,6 +31,9 @@ services:
     volumes:
       - ./data/nginx/conf/:/etc/nginx/conf.d/:ro
       - ./data/certbot/www/:/var/www/certbot/:ro
+    ports:
+      - 80:80
+      - 443:443
     networks:
       - relayer
     depends_on:
