@@ -14,7 +14,7 @@ services:
       - NEXTAUTH_URL
       - NEXTAUTH_SECRET
       - NEXT_XCALLSCAN_BASE_URL=${NEXT_XCALLSCAN_BASE_URL:-https://xcallscan.xyz/api}
-      - NEXT_RELAYER_SOCKET_PATH=${SOCKET_PATH:-/home/relayer/relayer.sock}
+      - NEXT_RELAYER_SOCKET_PATH=${SOCKET_PATH:-/home/relayer/.centralized-relay/relayer.sock}
     depends_on:
       - relayer
   certbot:
