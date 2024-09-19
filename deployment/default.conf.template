@@ -4,11 +4,11 @@ upstream backend {
 
 server {
 	listen 80 default_server;
-	server_name example.com;
+	server_name ${DOMAIN};
   server_tokens off;
 
 	location ~ /.well-known/acme-challenge {
-		root /var/www/certbot/example.com;
+		root /var/www/certbot/${DOMAIN};
 		allow all;
 	}
 
@@ -19,10 +19,10 @@ server {
 
 server {
 	listen 443 http2;
-	server_name example.com;
+	server_name ${DOMAIN}
 
-	# ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
-	# ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+	# ssl_certificate /etc/letsencrypt/live/${DOMAIN}/fullchain.pem;
+	# ssl_certificate_key /etc/letsencrypt/live/${DOMAIN}/privkey.pem;
 
 	location / {
 		    proxy_pass 		      http://backend;

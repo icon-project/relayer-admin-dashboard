@@ -1,9 +1,7 @@
 FROM nginx:alpine
 
-ARG DOMAIN
-
 RUN rm /etc/nginx/conf.d/default.conf
 
-COPY deployment/nginx.conf /etc/nginx/conf.d/
+COPY deployment/default.conf.template /etc/nginx/templates
 
 EXPOSE 80 443

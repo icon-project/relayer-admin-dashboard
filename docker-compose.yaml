@@ -1,10 +1,11 @@
 services:
   web:
-    build: iconcommunity/relayer-admin-dasboard:latest
+    image: iconcommunity/relayer-admin-dasboard:latest
+    restart: unless-stopped
     ports:
       - 3000:3000
     volumes:
-      - ./data/relayer:/home/relayer/.centralized-relay
+      - ./data/dashboard:/home/relayer/.centralized-relay
     networks:
       - relayer
     environment:
@@ -19,15 +20,16 @@ services:
       - relayer
   certbot:
     image: certbot/certbot:latest
-    environment:
-      - DOMAIN
+    restart: unless-stopped
     volumes:
       - ./data/certbot/www/:/var/www/certbot/:rw
       - ./data/certbot/conf/:/etc/letsencrypt/:rw
     entrypoint: /bin/sh -c "trap exit TERM; while :; do sleep 12h & wait $${!}; certbot renew; done"
 
   nginx:
-    build: nginx.Dockerfile
+    build:
+      dockerfile: nginx.Dockerfile
+    restart: unless-stopped
     volumes:
       - ./data/nginx/conf/:/etc/nginx/conf.d/:ro
       - ./data/certbot/www/:/var/www/certbot/:ro
