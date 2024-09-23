@@ -1,6 +1,6 @@
 services:
   web:
-    image: iconcommunity/relayer-admin-dasboard:latest
+    image: iconcommunity/relayer-admin-dashboard:latest
     restart: unless-stopped
     ports:
       - 3000:3000
