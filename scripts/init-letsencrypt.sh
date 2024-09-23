@@ -5,39 +5,57 @@ if ! [ -x "$(command -v docker compose)" ]; then
   exit 1
 fi
 
-for arg in "$@"
-do
-    case $arg in
-        --domain=*)
-            domain="${arg#*=}"
-            shift
+domain=""
+staging=0
+email=""
+data_path="./data/certbot"
+
+#!/bin/bash
+
+if ! [ -x "$(command -v docker compose)" ]; then
+  echo 'Error: docker compose is not installed.' >&2
+  exit 1
+fi
+
+# Set default values
+domain=""
+staging=0
+email=""
+data_path="./data/certbot"
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --domain)
+            domain="$2"
+            shift 2 # Remove --domain and its value from processing
         ;;
         --staging)
             staging=1
-            shift
+            shift # Remove --staging from processing
         ;;
-        --email=*)
-            email="${arg#*=}"
-            shift
+        --email)
+            email="$2"
+            shift 2 # Remove --email and its value from processing
         ;;
-        --data=*)
-            data_path="${arg#*=}"
-            shift
+        --data)
+            data_path="$2"
+            shift 2 # Remove --data and its value from processing
         ;;
         *)
+            # Unknown option
+            echo "Unknown option: $1"
+            exit 1
         ;;
     esac
 done
 
 if [ -z "$domain" ]; then
-    echo "Usage: $0 --domain=example.org [--staging] [--email=user@example.org] [--data=/path/to/data]"
+    echo "Usage: $0 --domain example.org [--staging] [--email user@example.org] [--data /path/to/data]"
     exit 1
 fi
 
 domains=($domain)
 rsa_key_size=4096
-staging=${staging:-0}
-
 if [ -d "$data_path" ]; then
   read -p "Existing data found for $domains. Continue and replace existing certificate? (y/N) " decision
   if [ "$decision" != "Y" ] && [ "$decision" != "y" ]; then
