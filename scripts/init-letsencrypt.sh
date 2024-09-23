@@ -10,19 +10,6 @@ staging=0
 email=""
 data_path="./data/certbot"
 
-#!/bin/bash
-
-if ! [ -x "$(command -v docker compose)" ]; then
-  echo 'Error: docker compose is not installed.' >&2
-  exit 1
-fi
-
-# Set default values
-domain=""
-staging=0
-email=""
-data_path="./data/certbot"
-
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --domain)
