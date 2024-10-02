@@ -1,4 +1,7 @@
 FROM oven/bun:latest AS base
+
+ARG PORT=3000
+
 WORKDIR /usr/src/app
 
 FROM base AS install
@@ -18,10 +21,10 @@ ENV NODE_ENV=production
 RUN bun run build
 
 FROM base AS release
-COPY --from=install /temp/prod/node_modules node_modules
-COPY --from=prerelease /usr/src/app/.next .next
-COPY --from=prerelease /usr/src/app/package.json .
+COPY --from=prerelease /usr/src/app/.next/standalone .
+COPY --from=prerelease /usr/src/app/.next/static .next/static
+COPY public /usr/src/app/public
 
 USER bun
 EXPOSE 3000/tcp
-ENTRYPOINT [ "bun", "start" ]
+ENTRYPOINT [ "bun", "server.js" ]
