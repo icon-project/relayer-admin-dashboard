@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import path from 'path';
 import serverFetch from './server-fetch';
 
+
 const tokenCache: { [relayerId: string]: CachedToken } = {};
 
 interface RelayerConfig {
@@ -71,6 +72,19 @@ async function getCachedRelayerToken(relayerId: string): Promise<CachedToken> {
   return newCachedToken;
 }
 
+export async function getCsrfToken(relayerId: string): Promise<string> {
+  try {
+    const relayer = await getRelayerById(relayerId)
+    const response = await serverFetch(`${relayer.host}/api/auth/csrf`, {
+      method: 'GET'
+    })
+    const data = await response.json()
+    return data.csrf
+  } catch (error: any) {
+    throw new Error('Failed to get csrf token')
+  }
+}
+
 async function getRelayerToken(id: string): Promise<RelayerToken> {
   try {
     const relayer = await getRelayerById(id)
@@ -81,11 +95,11 @@ async function getRelayerToken(id: string): Promise<RelayerToken> {
     const response = await serverFetch(`${relayer.host}/api/auth/signin`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'csrf-token': await getCsrfToken(id)
       },
       body: JSON.stringify(postBody),
     })
-    console.log(await response.text())
     const data = await response.json()
     return {
       id,
@@ -93,7 +107,6 @@ async function getRelayerToken(id: string): Promise<RelayerToken> {
       host: relayer.host,
     }
   } catch (error: any) {
-    console.log(error.message)
     throw new Error('Failed to get relayer token')
   }
 }
@@ -103,7 +116,6 @@ export async function Proxy(request: ProxyRequest) {
     const relayer = await getCachedRelayerToken(request.relayerId)
     const url = `${relayer.host}/event?${new URLSearchParams(request.args).toString()}`
     console.log(JSON.stringify(request))
-    console.log(JSON.stringify(relayer))
     const response = await serverFetch(url, {
       method: request.method,
       headers: {
@@ -114,7 +126,6 @@ export async function Proxy(request: ProxyRequest) {
     })
     return response.json()
   } catch (error) {
-    console.log(error);
     throw new Error('Failed to proxy request')
   }
 }

@@ -153,10 +153,10 @@ export interface BlockEvents {
 
 class SocketManager extends EventEmitter {
   private socket: Socket | null = null;
-  private readonly socketPath: string = process.env.NEXT_RELAYER_SOCKET_PATH || '/tmp/relayer.sock';
+  private readonly socketPath: string = process.env.NEXT_RELAYER_SOCKET_PATH || '/tmp/relayer/relay.sock';
   private retryCount: number = 0;
-  private maxRetries: number = 5;
-  private baseRetryDelay: number = 3000;
+  private maxRetries: number = 3;
+  private baseRetryDelay: number = 1000;
 
   constructor() {
     super();

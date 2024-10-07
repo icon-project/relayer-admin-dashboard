@@ -174,7 +174,7 @@ const MessageTable: FC = () => {
                       height={32}
                       sizes="16px"
                       className="rounded-circle"
-                      src={`https://xcallscan.xyz/_next/image?url=%2Fimages%2Fnetwork-${message.src_network}.png&w=32&q=75`}
+                      src={`https://xcallscan.xyz/_next/image?url=/images/network-${message.src_network}.png&w=32&q=75`}
                       alt={message.src_network}
                     />
                   </div>
