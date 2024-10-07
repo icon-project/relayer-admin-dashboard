@@ -2,9 +2,12 @@ name: Nextjs Docker Publish
 
 on:
   push:
+    branches:
+      - main
     tags:
       - "v*.*.*" # run on semver tags
       - "v*.*.*-*" # run on pre-release tags
+  workflow_dispatch:
 
 jobs:
   build:
@@ -28,4 +31,4 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: iconcommunity/relayer-admin-dashboard:latest
+          tags: iconcommunity/relayer-admin-dashboard:{{ github.ref }}
