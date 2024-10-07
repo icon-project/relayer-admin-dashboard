@@ -50,7 +50,7 @@ export async function authenticate(email: string, password: string): Promise<Use
   if (!user) {
     throw new Error(dict.login.message.auth_failed)
   }
-  return { ...user, password: null }
+  return { ...user }
 }
 export async function sign(user: any, secret: string): Promise<string> {
   const key = new TextEncoder().encode(secret);

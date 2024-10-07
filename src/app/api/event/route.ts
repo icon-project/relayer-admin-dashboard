@@ -1,15 +1,11 @@
 import fetchMetrics from "@/utils/metrics";
 import { Event, socketManager } from "@/utils/socket-fetch";
 
-async function handleEvent(event: Event, body: any, args: Record<string, string>): Promise<Response> {
+async function handleEvent(event: Event, req: Request, args: Record<string, string>): Promise<Response> {
   let data;
   switch (event) {
     case Event.GetBlock:
-      const { all } = args
-      if (!args.chain) {
-        return Response.json({ error: 'Missing chain params' }, { status: 400 })
-      }
-      const isAll = (all !== '')
+      const isAll = (args.chain !== '')
       data = await socketManager.getBlock(args.chain, isAll);
       break;
     case Event.GetMessageList:
@@ -43,13 +39,15 @@ async function handleEvent(event: Event, body: any, args: Record<string, string>
       data = await socketManager.listChains();
       break;
     case Event.GetChainBalance:
-      data = await socketManager.getChainBalance(body);
+      const chains = await req.json();
+      data = await socketManager.getChainBalance(chains);
       break;
     case Event.RelayMessage:
       if (!args.chain) {
         return Response.json({ error: 'Missing chain params' }, { status: 400 })
       }
-      data = await socketManager.relayMessage(args.chain, body.sn, body.height);
+      const { relaySn, relayHeight } = await req.json();
+      data = await socketManager.relayMessage(args.chain, relaySn, relayHeight);
       break;
     case Event.PruneDB:
       data = await socketManager.pruneDB();
@@ -77,14 +75,13 @@ async function handler(req: Request): Promise<Response> {
       return Response.json({ error: 'Missing event parameter' }, { status: 400 });
     }
     const args: Record<string, string> = {}
-    url.searchParams.forEach((key, value) => {
+    url.searchParams.forEach((value, key) => {
       args[key] = value
     })
-    const data = await req.json()
-    return await handleEvent(event, data, args)
+    return await handleEvent(event, req, args)
     } catch (error: any) {
       return Response.json({ error: error.message }, { status: 500 });
   }
 }
 
-export { handler as GET, handler as POST };
+export { handler as DELETE, handler as GET, handler as POST, handler as PUT };

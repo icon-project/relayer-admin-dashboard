@@ -49,6 +49,7 @@ export async function loadRelayer(): Promise<RelayerConfig[]> {
 async function getRelayerById(id: string): Promise<RelayerConfig> {
   const relayers = await loadRelayer()
   const relayer = relayers.find((r: RelayerConfig) => r.id === id)
+  console.log(relayers, id, relayer)
   if (!relayer) {
     throw new Error('Relayer not found')
   }
@@ -72,61 +73,86 @@ async function getCachedRelayerToken(relayerId: string): Promise<CachedToken> {
   return newCachedToken;
 }
 
-export async function getCsrfToken(relayerId: string): Promise<string> {
-  try {
-    const relayer = await getRelayerById(relayerId)
-    const response = await serverFetch(`${relayer.host}/api/auth/csrf`, {
-      method: 'GET'
-    })
-    const data = await response.json()
-    return data.csrf
-  } catch (error: any) {
-    throw new Error('Failed to get csrf token')
-  }
-}
-
 async function getRelayerToken(id: string): Promise<RelayerToken> {
   try {
     const relayer = await getRelayerById(id)
     const postBody = {
       email: relayer.auth.email,
       password: relayer.auth.password,
+      csrfToken: await getCsrfToken(id),
     }
-    const response = await serverFetch(`${relayer.host}/api/auth/signin`, {
+    const { credentials } = await getProviders(id)
+    const response = await serverFetch(credentials.callbackUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'csrf-token': await getCsrfToken(id)
+        'Accept': 'application/json',
       },
       body: JSON.stringify(postBody),
     })
-    const data = await response.json()
+    const data = response.headers.get('Set-Cookie')
+    if (!data) {
+      throw new Error('Failed to get relayer token')
+    }
+    const tokenMatch = data.match(/token=([^;]+);/)
+    if (!tokenMatch) {
+      throw new Error('Failed to get relayer token')
+    }
+    const token = tokenMatch[1]
     return {
       id,
-      token: data.token,
+      token: token,
       host: relayer.host,
     }
   } catch (error: any) {
+    console.error(error)
     throw new Error('Failed to get relayer token')
+  }
+}
+
+export async function getCsrfToken(relayerId: string): Promise<string> {
+  try {
+    const relayer = await getRelayerById(relayerId)
+    const response = await serverFetch(`${relayer.host}/api/auth/csrf`)
+    const data = await response.json()
+    return data.csrfToken
+  } catch (error) {
+    throw new Error('Failed to get csrf token')
+  }
+}
+
+interface ProviderResponse {
+  credentials: {
+    callbackUrl: string;
+  };
+}
+export async function getProviders(relayerId: string): Promise<ProviderResponse> {
+  try {
+    const relayer = await getRelayerById(relayerId)
+    const response = await serverFetch(`${relayer.host}/api/auth/providers`)
+    const data = await response.json()
+    return data
+  } catch (error) {
+    throw new Error('Failed to get providers')
   }
 }
 
 export async function Proxy(request: ProxyRequest) {
   try {
     const relayer = await getCachedRelayerToken(request.relayerId)
-    const url = `${relayer.host}/event?${new URLSearchParams(request.args).toString()}`
-    console.log(JSON.stringify(request))
+    const url = `${relayer.host}/api/event?${new URLSearchParams(request.args).toString()}`
     const response = await serverFetch(url, {
       method: request.method,
       headers: {
         'Authorization': `Bearer ${relayer.token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(request.body),
+      body: request?.body,
     })
     return response.json()
   } catch (error) {
-    throw new Error('Failed to proxy request')
+    console.error(error)
+    throw new Error('Failed to proxy request to relayer')
   }
 }
 

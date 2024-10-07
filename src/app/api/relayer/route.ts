@@ -8,7 +8,7 @@ async function handler(req: Request): Promise<Response> {
   const url = new URL(req.url);
   const event = url.searchParams.get('event') as Event;
   const cookieStore = cookies();
-  const relayerId = cookieStore.get('relayerId');
+  const relayerId = cookieStore.get('relayerId')?.value || url.searchParams.get('relayerId');
 
   if (!event) {
     return Response.json({ error: 'Missing event parameter' }, { status: 400 });
@@ -16,11 +16,13 @@ async function handler(req: Request): Promise<Response> {
 
   const chain = url.searchParams.get('chain') || '';
 
+
   if (relayerId) {
     const proxyRequest: ProxyRequest = {
-      relayerId: relayerId?.value,
+      relayerId: relayerId,
       method: req.method,
       body: req?.body,
+      args: Object.fromEntries(url.searchParams),
     };
     try {
       const proxyResponse = await Proxy(proxyRequest);
@@ -33,10 +35,7 @@ async function handler(req: Request): Promise<Response> {
       let data;
       switch (event) {
         case Event.GetBlock:
-          if (!chain) {
-            return Response.json({error: 'Missing chain param'}, { status: 400})
-          }
-          const all = url.searchParams.get('all') === 'true';
+          const all = url.searchParams.get('chain') !== '';
           data = await socketManager.getBlock(chain, all);
           break;
         case Event.GetMessageList:

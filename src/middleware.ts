@@ -20,9 +20,12 @@ export default async function middleware(request: NextRequest, event: NextFetchE
 
   const excludedPaths = [
     '/login',
+    '/api/auth/providers',
+    '/api/auth/csrf',
+    '/api/auth/callback/',
   ]
 
-  if (!excludedPaths.includes(request.nextUrl.pathname)) {
+  if (excludedPaths.includes(request.nextUrl.pathname)) {
     const res: NextMiddlewareResult = await withAuth(
       // Response with local cookies
       () => response,
@@ -37,4 +40,10 @@ export default async function middleware(request: NextRequest, event: NextFetchE
   }
 
   return response
+}
+export const config = {
+  matcher: [
+    "/api/event",
+    "/api/relayer"
+  ],
 }
