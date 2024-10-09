@@ -17,6 +17,7 @@ export enum Event {
   GetChainBalance = 'GetChainBalance',
   GetBlockEvents = 'GetBlockEvents',
   RelayInfo = 'RelayInfo',
+  FindChain = 'FindChain'
 }
 
 interface Packet {
@@ -144,10 +145,11 @@ export interface RequestBalance {
 }
 
 export interface BlockEvents {
-  chain: string;
   address: string;
-  event: string[];
+  event: string;
   height: number;
+  TxHash: string;
+  chainInfo: ChainInfo;
 }
 
 export interface RelayMessage {
@@ -164,6 +166,16 @@ export interface RequestBalance {
 export interface RelayInfo {
   version: string;
 	uptime: number;
+}
+
+export interface ChainInfo {
+  nid: string;
+  name: string;
+  type: string;
+  address?: {
+    xcall?: string;
+    connection?: string;
+  }
 }
 
 class SocketManager extends EventEmitter {
@@ -289,12 +301,16 @@ class SocketManager extends EventEmitter {
     return this.sendRequest<ChainBalanceResponse[]>(Event.GetChainBalance, chains);
   }
 
-  public async getBlockEvents(chain: string, txHash: string): Promise<BlockEvents> {
-    const data = { chain, txHash };
+  public async getBlockEvents(txHash: string): Promise<BlockEvents> {
+    const data = { txHash };
     return this.sendRequest<BlockEvents>(Event.GetBlockEvents, data);
   }
   public async relayInfo(): Promise<RelayInfo> {
     return this.sendRequest<RelayInfo>(Event.RelayInfo);
+  }
+  public async findChain(chain: string): Promise<ChainInfo> {
+    const data = { q: chain };
+    return this.sendRequest<ChainInfo>(Event.FindChain, data);
   }
 }
 

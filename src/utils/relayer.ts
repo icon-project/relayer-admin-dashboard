@@ -2,9 +2,15 @@ import fs from 'fs/promises';
 import { cookies } from 'next/headers';
 import path from 'path';
 import serverFetch from './server-fetch';
+import { BlockEvents, socketManager } from './socket-fetch';
 
 
 const tokenCache: { [relayerId: string]: CachedToken } = {};
+
+interface RelayerInfo {
+  id: string;
+  name: string;
+}
 
 interface RelayerConfig {
   id: string;
@@ -52,7 +58,7 @@ export async function loadRelayer(): Promise<RelayerConfig[]> {
   }
 }
 
-async function getRelayerById(id: string): Promise<RelayerConfig> {
+export async function getRelayerById(id: string): Promise<RelayerConfig> {
   const relayers = await loadRelayer()
   const relayer = relayers.find((r: RelayerConfig) => r.id === id)
   console.log(relayers, id, relayer)
@@ -60,6 +66,11 @@ async function getRelayerById(id: string): Promise<RelayerConfig> {
     throw new Error('Relayer not found')
   }
   return relayer
+}
+
+export async function getRelayerInfoById(id: string): Promise<RelayerInfo> {
+  const { id: relayerId, name } = await getRelayerById(id)
+  return { id: relayerId, name }
 }
 
 async function getCachedRelayerToken(relayerId: string): Promise<CachedToken> {
@@ -167,25 +178,47 @@ export function getCurrentRelayer(): string {
   return cookies().get('relayerId')?.value ?? ''
 }
 
-export async function getEventMissedRelayer(chain: string, txHash: string): Promise<string | null> {
+interface MissedRelayer {
+  relayerId: string;
+  data: BlockEvents;
+}
+
+export async function getEventMissedRelayer(txHash: string): Promise<MissedRelayer | null> {
   const relayers = await getAvailableRelayers();
-  const results = await Promise.all(relayers.map(async (relayer) => {
+  const socketTask = (async (): Promise<MissedRelayer | null> => {
+    try {
+      const data = await socketManager.getBlockEvents(txHash);
+      if (data && data.chainInfo) {
+        return { relayerId: "self", data: data };
+      }
+      return null;
+    } catch (error) {
+      console.error('Error fetching block events from socket:', error);
+      return null;
+    }
+  })
+  const tasks = relayers.map(async (relayer) => {
     try {
       const proxyRequest: ProxyRequest = {
-      relayerId: relayer.id,
-      method: 'GET',
-      args: { chain, txHash },
-    };
-    const response = await Proxy(proxyRequest);
-    const data = await response.json();
-    if (data && data.event.length > 0) {
-        return { relayerId: relayer.id, data };
+        relayerId: relayer.id,
+        method: 'POST',
+        body: JSON.stringify({ txHash }),
+        args: { event: 'GetBlockEvents' },
+      };
+      const response = await Proxy(proxyRequest);
+      const data: BlockEvents = await response.json()
+      if (data && data.chainInfo) {
+        return { relayerId: relayer.id, data: data };
       }
     } catch (error) {
       console.error(`Error fetching block events from relayer ${relayer.id}:`, error);
       return null;
     }
-  }));
+  });
+  const results = await Promise.all([...tasks, socketTask()]);
   const successfulResults = results.filter(result => result !== null);
-  return successfulResults.length > 0 ? successfulResults[0].relayerId : null;
+  if (successfulResults.length === 0) {
+    return null;
+  }
+  return successfulResults[0];
 }

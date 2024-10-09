@@ -1,5 +1,5 @@
 import { Message } from '@/utils/xcall-fetcher';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 
 interface MessageModalProps {
@@ -8,7 +8,46 @@ interface MessageModalProps {
   message: Message;
 }
 
+async function findMissedBy(txHash: string): Promise<{ id: string; name: string } | null> {
+  const response = await fetch(`/api/find-event`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ txHash }),
+  });
+  if (!response.ok) {
+    return null;
+  }
+  const data = await response.json();
+  return data;
+}
+
+const handleExecute = async (txHash: string) => {
+  const missedBy = await findMissedBy(txHash);
+  if (!missedBy) {
+    alert('No relayer found');
+    return;
+  }
+  alert(`Missed by relayer ${missedBy.name}`);
+};
+
 const MessageModal: React.FC<MessageModalProps> = ({ show, handleClose, message }) => {
+  const [relayInfo, setRelayInfo] = React.useState<{ id: string; name: string } | null>(null);
+  useEffect(() => {
+    const fetchMissedBy = async () => {
+      try {
+        const result = await findMissedBy(message.src_tx_hash);
+        setRelayInfo(result);
+      } catch (error) {
+        console.error('Error fetching missed by information:', error);
+      }
+    };
+
+    if (show) {
+      fetchMissedBy();
+    }
+  }, [show]);
   return (
     <Modal show={show} onHide={handleClose} role="dialog" size="lg" centered>
       <Modal.Header closeButton>
@@ -21,13 +60,14 @@ const MessageModal: React.FC<MessageModalProps> = ({ show, handleClose, message 
         <p><strong>Destination Network:</strong> {message.dest_network}</p>
         <p><strong>Status:</strong> {message.status}</p>
         <p><strong>Created At:</strong> {message.created_at}</p>
+        <p><strong>Source Address:</strong> {message.src_address}</p>
+        { relayInfo && <p><strong>Missed By:</strong> {relayInfo ? relayInfo.name : 'Loading...'}</p> }
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>
-        <Button variant="danger" onClick={handleClose}>
-          Execute
+        <Button variant="danger" onClick={() => handleExecute(message.src_tx_hash)}>
         </Button>
       </Modal.Footer>
     </Modal>

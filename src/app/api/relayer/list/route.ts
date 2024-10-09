@@ -1,10 +1,10 @@
 import { getAvailableRelayers } from "@/utils/relayer"
 
-export async function GET(req: Request) {
+export async function GET(req: Request): Promise<Response> {
   try {
     const relayers = await getAvailableRelayers()
-    return new Response(JSON.stringify(relayers))
+    return Response.json(relayers)
   } catch (e: any) {
-    return new Response(e.message, { status: 500 })
+    return Response.json({ error: e.message }, { status: 500 })
   }
 }

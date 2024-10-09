@@ -8,6 +8,7 @@
 		}
 	],
 	"settings": {
-		"terminal.integrated.splitCwd": "workspaceRoot"
+		"terminal.integrated.splitCwd": "workspaceRoot",
+		"makefile.configureOnOpen": false
 	}
 }

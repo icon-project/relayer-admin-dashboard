@@ -65,7 +65,7 @@ async function handleEvent(event: Event, req: Request, args: Record<string, stri
       if (!args.chain && !args.txHash) {
         return Response.json({ error: 'Missing params' }, { status: 400 });
       }
-      data = await socketManager.getBlockEvents(args.chain, args.txHash);
+      data = await socketManager.getBlockEvents(args.txHash);
       break;
     default:
       return Response.json({ error: 'Invalid event' }, { status: 400 });
