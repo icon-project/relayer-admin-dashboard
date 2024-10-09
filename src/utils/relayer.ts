@@ -35,6 +35,12 @@ export interface ProxyRequest {
   body?: any;
 }
 
+interface ProviderResponse {
+  credentials: {
+    callbackUrl: string;
+  };
+}
+
 export async function loadRelayer(): Promise<RelayerConfig[]> {
   try {
     const relayersPath = process.env.NEXT_RELAYERS_MAP_FILE || path.join(process.cwd(), 'relayers.json')
@@ -114,18 +120,13 @@ export async function getCsrfToken(relayerId: string): Promise<string> {
   try {
     const relayer = await getRelayerById(relayerId)
     const response = await serverFetch(`${relayer.host}/api/auth/csrf`)
-    const data = await response.json()
-    return data.csrfToken
+    const { csrfToken } = await response.json()
+    return csrfToken
   } catch (error) {
     throw new Error('Failed to get csrf token')
   }
 }
 
-interface ProviderResponse {
-  credentials: {
-    callbackUrl: string;
-  };
-}
 export async function getProviders(relayerId: string): Promise<ProviderResponse> {
   try {
     const relayer = await getRelayerById(relayerId)
@@ -149,7 +150,8 @@ export async function Proxy(request: ProxyRequest) {
       },
       body: request?.body,
     })
-    return response.json()
+    const data = await response.json()
+    return data
   } catch (error) {
     console.error(error)
     throw new Error('Failed to proxy request to relayer')
@@ -163,4 +165,27 @@ export async function getAvailableRelayers(): Promise<{ id: string, name: string
 
 export function getCurrentRelayer(): string {
   return cookies().get('relayerId')?.value ?? ''
+}
+
+export async function getEventMissedRelayer(chain: string, txHash: string): Promise<string | null> {
+  const relayers = await getAvailableRelayers();
+  const results = await Promise.all(relayers.map(async (relayer) => {
+    try {
+      const proxyRequest: ProxyRequest = {
+      relayerId: relayer.id,
+      method: 'GET',
+      args: { chain, txHash },
+    };
+    const response = await Proxy(proxyRequest);
+    const data = await response.json();
+    if (data && data.event.length > 0) {
+        return { relayerId: relayer.id, data };
+      }
+    } catch (error) {
+      console.error(`Error fetching block events from relayer ${relayer.id}:`, error);
+      return null;
+    }
+  }));
+  const successfulResults = results.filter(result => result !== null);
+  return successfulResults.length > 0 ? successfulResults[0].relayerId : null;
 }

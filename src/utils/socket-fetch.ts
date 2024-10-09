@@ -15,10 +15,9 @@ export enum Event {
   GetConfig = 'GetConfig',
   ListChainInfo = 'ListChainInfo',
   GetChainBalance = 'GetChainBalance',
-
-  GetBlockEvents = 'GetBlockEvents'
+  GetBlockEvents = 'GetBlockEvents',
+  RelayInfo = 'RelayInfo',
 }
-
 
 interface Packet {
   id: string;
@@ -151,6 +150,22 @@ export interface BlockEvents {
   height: number;
 }
 
+export interface RelayMessage {
+  chain: string;
+  fromHeight: number;
+  toHeight?: number;
+}
+
+export interface RequestBalance {
+  chain: string;
+  address: string;
+}
+
+export interface RelayInfo {
+  version: string;
+	uptime: number;
+}
+
 class SocketManager extends EventEmitter {
   private socket: Socket | null = null;
   private readonly socketPath: string = process.env.NEXT_RELAYER_SOCKET_PATH || '/tmp/relayer/relay.sock';
@@ -172,7 +187,7 @@ class SocketManager extends EventEmitter {
       console.log('Connected to UNIX domain socket');
       this.retryCount = 0;
     });
-    this.socket.on('data' , (data) => {
+    this.socket.on('data', (data) => {
       try {
         const response: SocketResponse = JSON.parse(data.toString());
         this.emit(response.id, response);
@@ -274,11 +289,13 @@ class SocketManager extends EventEmitter {
     return this.sendRequest<ChainBalanceResponse[]>(Event.GetChainBalance, chains);
   }
 
-  public async getBlockEvents(chain: string, height: number): Promise<BlockEvents> {
-    const data = { chain, height}
+  public async getBlockEvents(chain: string, txHash: string): Promise<BlockEvents> {
+    const data = { chain, txHash };
     return this.sendRequest<BlockEvents>(Event.GetBlockEvents, data);
   }
-
+  public async relayInfo(): Promise<RelayInfo> {
+    return this.sendRequest<RelayInfo>(Event.RelayInfo);
+  }
 }
 
-export const socketManager = new SocketManager()
+export const socketManager = new SocketManager();
