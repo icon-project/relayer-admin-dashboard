@@ -17,7 +17,7 @@ async function handler(req: Request): Promise<Response> {
   const chain = url.searchParams.get('chain') || '';
 
 
-  if (relayerId) {
+  if (relayerId && relayerId != "self") {
     const proxyRequest: ProxyRequest = {
       relayerId: relayerId,
       method: req.method,
@@ -59,8 +59,8 @@ async function handler(req: Request): Promise<Response> {
           data = await socketManager.getConfig(chain);
           break;
         case Event.RelayMessage:
-          const { chain: nid, fromHeight, toHeight } = await req.json()
-          data = await socketManager.relayMessage(nid, fromHeight, toHeight)
+          const { chain: nid, txHash } = await req.json()
+          data = await socketManager.relayMessage(nid, txHash);
           break;
         case Event.PruneDB:
           data = await socketManager.pruneDB();

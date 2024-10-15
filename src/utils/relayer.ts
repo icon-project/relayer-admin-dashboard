@@ -187,9 +187,11 @@ export async function getEventMissedRelayer(txHash: string): Promise<MissedRelay
   const relayers = await getAvailableRelayers();
   const socketTask = (async (): Promise<MissedRelayer | null> => {
     try {
-      const data = await socketManager.getBlockEvents(txHash);
-      if (data && data.chainInfo) {
-        return { relayerId: "self", data: data };
+      const events: BlockEvents[] = await socketManager.getBlockEvents(txHash);
+      for (const event of events) {
+        if (!event.executed) {
+          return { relayerId: 'self', data: event };
+        }
       }
       return null;
     } catch (error) {
@@ -206,9 +208,11 @@ export async function getEventMissedRelayer(txHash: string): Promise<MissedRelay
         args: { event: 'GetBlockEvents' },
       };
       const response = await Proxy(proxyRequest);
-      const data: BlockEvents = await response.json()
-      if (data && data.chainInfo) {
-        return { relayerId: relayer.id, data: data };
+      const events: BlockEvents[] = await response.json()
+      for (const event of events) {
+        if (!event.executed) {
+          return { relayerId: relayer.id, data: event };
+        }
       }
     } catch (error) {
       console.error(`Error fetching block events from relayer ${relayer.id}:`, error);
@@ -217,8 +221,8 @@ export async function getEventMissedRelayer(txHash: string): Promise<MissedRelay
   });
   const results = await Promise.all([...tasks, socketTask()]);
   const successfulResults = results.filter(result => result !== null);
-  if (successfulResults.length === 0) {
-    return null;
+  if (successfulResults.length > 0) {
+    return successfulResults[0] as MissedRelayer;
   }
-  return successfulResults[0];
+  return null;
 }

@@ -43,11 +43,8 @@ async function handleEvent(event: Event, req: Request, args: Record<string, stri
       data = await socketManager.getChainBalance(chains);
       break;
     case Event.RelayMessage:
-      if (!args.chain) {
-        return Response.json({ error: 'Missing chain params' }, { status: 400 });
-      }
-      const { relaySn, relayHeight } = await req.json();
-      data = await socketManager.relayMessage(args.chain, relaySn, relayHeight);
+      const { txHash: eventTxHash, chain: chainNID } = await req.json();
+      data = await socketManager.relayMessage(chainNID, eventTxHash);
       break;
     case Event.PruneDB:
       data = await socketManager.pruneDB();
@@ -62,10 +59,11 @@ async function handleEvent(event: Event, req: Request, args: Record<string, stri
       data = await fetchMetrics();
       break;
     case Event.GetBlockEvents:
-      if (!args.chain && !args.txHash) {
+      const { txHash } = await req.json();
+      if (!txHash) {
         return Response.json({ error: 'Missing params' }, { status: 400 });
       }
-      data = await socketManager.getBlockEvents(args.txHash);
+      data = await socketManager.getBlockEvents(txHash);
       break;
     default:
       return Response.json({ error: 'Invalid event' }, { status: 400 });

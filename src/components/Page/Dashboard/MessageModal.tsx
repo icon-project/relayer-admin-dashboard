@@ -8,8 +8,8 @@ interface MessageModalProps {
   message: Message;
 }
 
-async function findMissedBy(txHash: string): Promise<{ id: string; name: string } | null> {
-  const response = await fetch(`/api/find-event`, {
+async function findMissedBy(txHash: string): Promise<{ id: string; name: string, data: any } | null> {
+  const response = await fetch(`/api/relayer/find-event`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -29,7 +29,18 @@ const handleExecute = async (txHash: string) => {
     alert('No relayer found');
     return;
   }
-  alert(`Missed by relayer ${missedBy.name}`);
+ const response = await fetch(`/api/event?event=RelayMessage?relayerId=${missedBy.id}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ txHash, chain: missedBy.data.chainInfo.nid }),
+  });
+  if (!response.ok) {
+    return null;
+  }
+  const data = await response.json();
+  return data;
 };
 
 const MessageModal: React.FC<MessageModalProps> = ({ show, handleClose, message }) => {
@@ -68,6 +79,7 @@ const MessageModal: React.FC<MessageModalProps> = ({ show, handleClose, message 
           Close
         </Button>
         <Button variant="danger" onClick={() => handleExecute(message.src_tx_hash)}>
+          Execute
         </Button>
       </Modal.Footer>
     </Modal>

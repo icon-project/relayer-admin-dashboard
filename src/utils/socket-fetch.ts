@@ -54,8 +54,8 @@ export interface MessageListResponse {
 
 export interface RelayMessage {
   chain: string;
-  fromHeight: number;
-  toHeight?: number;
+  txHash: string;
+  height?: number;
 }
 
 export interface RelayMessageResponse {
@@ -147,15 +147,10 @@ export interface RequestBalance {
 export interface BlockEvents {
   address: string;
   event: string;
+  executed: boolean;
   height: number;
-  TxHash: string;
+  txHash: string;
   chainInfo: ChainInfo;
-}
-
-export interface RelayMessage {
-  chain: string;
-  fromHeight: number;
-  toHeight?: number;
 }
 
 export interface RequestBalance {
@@ -264,8 +259,8 @@ class SocketManager extends EventEmitter {
     return this.sendRequest<MessageListResponse>(Event.GetMessageList, data);
   }
 
-  public async relayMessage(chain: string, fromHeight: number, toHeight?: number): Promise<RelayMessageResponse> {
-    const data: RelayMessage = { chain, fromHeight, toHeight };
+  public async relayMessage(chain: string, txHash: string): Promise<RelayMessageResponse> {
+    const data: RelayMessage = { chain, txHash };
     return this.sendRequest<RelayMessageResponse>(Event.RelayMessage, data);
   }
 
@@ -301,9 +296,9 @@ class SocketManager extends EventEmitter {
     return this.sendRequest<ChainBalanceResponse[]>(Event.GetChainBalance, chains);
   }
 
-  public async getBlockEvents(txHash: string): Promise<BlockEvents> {
+  public async getBlockEvents(txHash: string): Promise<BlockEvents[]> {
     const data = { txHash };
-    return this.sendRequest<BlockEvents>(Event.GetBlockEvents, data);
+    return this.sendRequest<BlockEvents[]>(Event.GetBlockEvents, data);
   }
   public async relayInfo(): Promise<RelayInfo> {
     return this.sendRequest<RelayInfo>(Event.RelayInfo);
