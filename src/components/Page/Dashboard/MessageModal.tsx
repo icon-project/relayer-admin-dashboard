@@ -8,23 +8,50 @@ interface MessageModalProps {
   message: Message;
 }
 
-async function findMissedBy(txHash: string): Promise<{ id: string; name: string, data: any } | null> {
-  const response = await fetch(`/api/relayer/find-event`, {
+async function findMissedBy(message: Message): Promise<{ id: string; name: string, txHash: string; data: any } | null> {
+  let response: Response;
+  let data: any;
+  response = await fetch(`/api/relayer/find-event`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ txHash }),
+    body: JSON.stringify({ txHash: message.src_tx_hash }),
   });
   if (!response.ok) {
     return null;
   }
-  const data = await response.json();
+  data = await response.json();
+  for (const event of data) {
+    if (!event.executed) {
+      data = { id: event.relayerId, name: event.name, txHash: event.txHash, data: event.data };
+      break;
+    }
+  }
+  if (message.status === "delivered") {
+    response = await fetch(`/api/relayer/find-event`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ txHash: message.dest_tx_hash }),
+    });
+    if (!response.ok) {
+      return null;
+    }
+    data = await response.json();
+    for (const event of data) {
+      if (!event.executed) {
+        data = { id: event.relayerId, name: event.name, txHash: event.txHash, data: event.data };
+        break;
+      }
+    }
+  }
   return data;
 }
 
-const handleExecute = async (txHash: string) => {
-  const missedBy = await findMissedBy(txHash);
+const handleExecute = async (message: Message) => {
+  const missedBy = await findMissedBy(message);
   if (!missedBy) {
     alert('No relayer found');
     return;
@@ -34,7 +61,7 @@ const handleExecute = async (txHash: string) => {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ txHash, chain: missedBy.data.chainInfo.nid }),
+    body: JSON.stringify({ txHash: missedBy.txHash, chain: missedBy.data.chainInfo.nid }),
   });
   if (!response.ok) {
     return null;
@@ -48,7 +75,7 @@ const MessageModal: React.FC<MessageModalProps> = ({ show, handleClose, message 
   useEffect(() => {
     const fetchMissedBy = async () => {
       try {
-        const result = await findMissedBy(message.src_tx_hash);
+        const result = await findMissedBy(message);
         setRelayInfo(result);
       } catch (error) {
         console.error('Error fetching missed by information:', error);
@@ -78,7 +105,7 @@ const MessageModal: React.FC<MessageModalProps> = ({ show, handleClose, message 
         <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>
-        <Button variant="danger" onClick={() => handleExecute(message.src_tx_hash)}>
+        <Button variant="danger" onClick={() => handleExecute(message)}>
           Execute
         </Button>
       </Modal.Footer>

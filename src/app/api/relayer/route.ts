@@ -8,8 +8,7 @@ async function handler(req: Request): Promise<Response> {
   const url = new URL(req.url);
   const event = url.searchParams.get('event') as Event;
   const cookieStore = cookies();
-  const relayerId = cookieStore.get('relayerId')?.value || url.searchParams.get('relayerId');
-
+  const relayerId = url.searchParams.get('relayerId') || cookieStore.get('relayerId')?.value;
   if (!event) {
     return Response.json({ error: 'Missing event parameter' }, { status: 400 });
   }
@@ -28,6 +27,7 @@ async function handler(req: Request): Promise<Response> {
       const proxyResponse = await Proxy(proxyRequest);
       return Response.json(proxyResponse);
     } catch (error: any) {
+      console.error(error);
       return Response.json({ error: error.message }, { status: 500 });
     }
   } else {

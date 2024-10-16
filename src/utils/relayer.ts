@@ -61,7 +61,6 @@ export async function loadRelayer(): Promise<RelayerConfig[]> {
 export async function getRelayerById(id: string): Promise<RelayerConfig> {
   const relayers = await loadRelayer()
   const relayer = relayers.find((r: RelayerConfig) => r.id === id)
-  console.log(relayers, id, relayer)
   if (!relayer) {
     throw new Error('Relayer not found')
   }
@@ -180,17 +179,22 @@ export function getCurrentRelayer(): string {
 
 interface MissedRelayer {
   relayerId: string;
+  name: string;
+  txHash: string;
   data: BlockEvents;
 }
 
-export async function getEventMissedRelayer(txHash: string): Promise<MissedRelayer | null> {
+export async function getEventMissedRelayer(txHash: string): Promise<MissedRelayer[] | null> {
   const relayers = await getAvailableRelayers();
   const socketTask = (async (): Promise<MissedRelayer | null> => {
     try {
       const events: BlockEvents[] = await socketManager.getBlockEvents(txHash);
+      if (!events || events.length === 0) {
+        return null;
+      }
       for (const event of events) {
         if (!event.executed) {
-          return { relayerId: 'self', data: event };
+          return { relayerId: 'self', name: "Self", txHash: txHash, data: event };
         }
       }
       return null;
@@ -209,10 +213,11 @@ export async function getEventMissedRelayer(txHash: string): Promise<MissedRelay
       };
       const response = await Proxy(proxyRequest);
       const events: BlockEvents[] = await response.json()
+      if (!events || events.length === 0) {
+        return null;
+      }
       for (const event of events) {
-        if (!event.executed) {
-          return { relayerId: relayer.id, data: event };
-        }
+        return { relayerId: relayer.id, name: relayer.name, txHash: event.txHash, data: event };
       }
     } catch (error) {
       console.error(`Error fetching block events from relayer ${relayer.id}:`, error);
@@ -221,8 +226,5 @@ export async function getEventMissedRelayer(txHash: string): Promise<MissedRelay
   });
   const results = await Promise.all([...tasks, socketTask()]);
   const successfulResults = results.filter(result => result !== null);
-  if (successfulResults.length > 0) {
-    return successfulResults[0] as MissedRelayer;
-  }
-  return null;
+  return successfulResults as MissedRelayer[];
 }

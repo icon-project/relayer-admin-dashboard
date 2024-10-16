@@ -41,7 +41,6 @@ export default async function serverFetch(...args: FetchArguments): Promise<Resp
           await delay(backoffDelay);
           throw new RetryableError(`Network-related error occurred (Status: ${statusCode}).`);
         }
-        console.log(await response.text())
         throw new Error(`HTTP error! Status: ${statusCode}`);
       }
 

@@ -59,11 +59,11 @@ async function handleEvent(event: Event, req: Request, args: Record<string, stri
       data = await fetchMetrics();
       break;
     case Event.GetBlockEvents:
-      const { txHash } = await req.json();
-      if (!txHash) {
+      const { txHash, height } = await req.json();
+      if (!txHash && !height) {
         return Response.json({ error: 'Missing params' }, { status: 400 });
       }
-      data = await socketManager.getBlockEvents(txHash);
+      data = await socketManager.getBlockEvents(txHash || height);
       break;
     default:
       return Response.json({ error: 'Invalid event' }, { status: 400 });
