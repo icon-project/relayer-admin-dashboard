@@ -9,7 +9,6 @@ const nextConfig = {
   sassOptions: {
     includePaths: [ path.join(__dirname, 'styles') ],
   },
-  generateBuildId: async () => process.env.GIT_HASH || 'development',
   images: {
     remotePatterns: [
       {
