@@ -34,8 +34,7 @@ async function handler(req: Request): Promise<Response> {
       let data;
       switch (event) {
         case Event.GetBlock:
-          const all = url.searchParams.get('chain') !== '';
-          data = await socketManager.getBlock(chain, all);
+          data = await socketManager.getBlock(chain);
           break;
         case Event.GetMessageList:
           data = await socketManager.getMessageList(chain, 10);
@@ -47,9 +46,6 @@ async function handler(req: Request): Promise<Response> {
             return Response.json({error: 'Missing chain param'}, { status: 400})
           }
           data = await socketManager.getFee(chain, network, response);
-          break;
-        case Event.GetLatestHeight:
-          data = await socketManager.getLatestHeight(chain);
           break;
         case Event.GetConfig:
           if (!chain) {

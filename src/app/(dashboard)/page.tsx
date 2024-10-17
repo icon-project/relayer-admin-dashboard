@@ -10,6 +10,7 @@ import {
   faWallet
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Link from 'next/link'
 import { Suspense } from 'react'
 import {
   Card,
@@ -67,7 +68,7 @@ export default async function Page() {
                 </DropdownToggle>
                 <DropdownMenu>
                   <DropdownItem href="#/action-1">{dict.dashboard.action.reset}</DropdownItem>
-                  <DropdownItem href="#/action-1">{dict.dashboard.action.view}</DropdownItem>
+                  <DropdownItem as={Link} href={`/chain/${chain.nid}`}>{dict.dashboard.xcall.actions.view}</DropdownItem>
                 </DropdownMenu>
               </Dropdown>
             </CardBody>

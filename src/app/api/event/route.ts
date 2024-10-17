@@ -5,8 +5,7 @@ async function handleEvent(event: Event, req: Request, args: Record<string, stri
   let data;
   switch (event) {
     case Event.GetBlock:
-      const isAll = (args.chain !== '');
-      data = await socketManager.getBlock(args.chain, isAll);
+      data = await socketManager.getBlock(args.chain);
       break;
     case Event.GetMessageList:
       if (!args.chain) {
@@ -23,12 +22,6 @@ async function handleEvent(event: Event, req: Request, args: Record<string, stri
       const isResponse = (args.response !== '');
       data = await socketManager.getFee(args.chain, args.network, isResponse);
       break;
-    case Event.GetLatestHeight:
-      if (!args.chain) {
-        return Response.json({ error: 'chain param missing' }, { status: 400 });
-      }
-      data = await socketManager.getLatestHeight(args.chain);
-      break;
     case Event.GetConfig:
       if (!args.chain) {
         return Response.json({ error: 'Missing chain param' }, { status: 400 });
@@ -36,7 +29,8 @@ async function handleEvent(event: Event, req: Request, args: Record<string, stri
       data = await socketManager.getConfig(args.chain);
       break;
     case Event.ListChainInfo:
-      data = await socketManager.listChains();
+      const { chains: nids } = await req.json();
+      data = await socketManager.listChains(nids);
       break;
     case Event.GetChainBalance:
       const chains = await req.json();

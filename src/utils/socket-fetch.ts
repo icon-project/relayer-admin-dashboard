@@ -10,14 +10,11 @@ export enum Event {
   PruneDB = 'PruneDB',
   GetFee = 'GetFee',
   ClaimFee = 'ClaimFee',
-  GetLatestHeight = 'GetLatestHeight',
-  GetBlockRange = 'GetBlockRange',
   GetConfig = 'GetConfig',
   ListChainInfo = 'ListChainInfo',
   GetChainBalance = 'GetChainBalance',
   GetBlockEvents = 'GetBlockEvents',
   RelayerInfo = 'RelayerInfo',
-  FindChain = 'FindChain'
 }
 
 interface Packet {
@@ -33,7 +30,8 @@ export interface SocketResponse extends Packet {
 
 export interface BlockResponse {
   chain: string;
-  height: number;
+  checkPointHeight: number;
+  latestHeight: number;
 };
 
 interface Message {
@@ -71,10 +69,6 @@ export interface PruneDBResponse {
   status: string;
 };
 
-export interface RevertMessageResponse {
-  sn: number;
-};
-
 export interface GetFee {
   chain: string;
   network: string;
@@ -86,17 +80,8 @@ export interface GetFeeResponse {
   fee: number;
 };
 
-export interface SetFeeResponse {
-  status: string;
-};
-
 export interface ClaimFeeResponse {
   status: string;
-};
-
-export interface ChainHeightResponse {
-  chain: string;
-  height: number;
 };
 
 export interface GetBalance {
@@ -118,7 +103,7 @@ export interface ChainInfoResponse {
   nid: string;
   type: string;
   address: string;
-  lastHeight: number;
+  latestHeight: number;
   lastCheckPoint: number
   contracts: {
     xcall?: string;
@@ -249,8 +234,8 @@ class SocketManager extends EventEmitter {
     return Math.random().toString(36).substring(2, 8);
   }
 
-  public async getBlock(chain: string, all: boolean): Promise<BlockResponse> {
-    const data = { chain, all };
+  public async getBlock(chain: string): Promise<BlockResponse> {
+    const data = { chain };
     return this.sendRequest<BlockResponse>(Event.GetBlock, data);
   }
 
@@ -278,18 +263,13 @@ class SocketManager extends EventEmitter {
     return this.sendRequest<ClaimFeeResponse>(Event.ClaimFee, data);
   }
 
-  public async getLatestHeight(chain: string): Promise<ChainHeightResponse> {
-    const data = { chain };
-    return this.sendRequest<ChainHeightResponse>(Event.GetLatestHeight, data);
-  }
-
   public async getConfig(chain: string): Promise<ConfigResponse> {
     const data = { chain };
     return this.sendRequest<ConfigResponse>(Event.GetConfig, data);
   }
 
   public async listChains(chains?: string[]): Promise<ChainInfoResponse[]> {
-    return this.sendRequest<ChainInfoResponse[]>(Event.ListChainInfo, chains);
+    return this.sendRequest<ChainInfoResponse[]>(Event.ListChainInfo, { chains });
   }
 
   public async getChainBalance(chains: RequestBalance[]): Promise<ChainBalanceResponse[]> {
@@ -302,10 +282,6 @@ class SocketManager extends EventEmitter {
   }
   public async relayInfo(): Promise<RelayInfo> {
     return this.sendRequest<RelayInfo>(Event.RelayerInfo);
-  }
-  public async findChain(chain: string): Promise<ChainInfo> {
-    const data = { q: chain };
-    return this.sendRequest<ChainInfo>(Event.FindChain, data);
   }
 }
 

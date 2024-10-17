@@ -1,18 +1,21 @@
-import MessageDetail from '@/components/Page/Dashboard/MessageDetail';
-import { MessageByIdResponse } from '@/utils/xcall-fetcher';
+import ChainDetails from '@/components/Page/Dashboard/ChainDetails';
+import { ChainInfoResponse } from '@/utils/socket-fetch';
 import { notFound } from 'next/navigation';
-import { fetchMessageById } from 'src/utils/xcall-fetcher';
 
-const fetchMessage = async (id: number): Promise<MessageByIdResponse> => {
- const data = await fetchMessageById(id);
-  if (!data) {
+const fetchChainInfo = async (id: string): Promise<ChainInfoResponse> => {
+  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const data = await fetch(`${BASE_URL}/relayer?chain=${id}&event=ListChainInfo`, {
+    method: 'POST',
+    body: JSON.stringify({ chains: [id] }),
+  }).then((res) => res.json());
+  if (!data || data.length === 0) {
     return notFound();
   }
   return data;
 }
 
 export default async function Page({ params }: { params: { id: string } }) {
-  const id = parseInt(params.id);
-  const data = await fetchMessage(id);
-  return <MessageDetail message={data} />
+  const id = params.id;
+  const data = await fetchChainInfo(id);
+  return <ChainDetails data={data[0]} />;
 };
