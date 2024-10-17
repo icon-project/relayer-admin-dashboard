@@ -85,6 +85,9 @@ async function handler(req: Request): Promise<Response> {
         case Event.Metrics:
           data = await fetchMetrics()
           break;
+        case Event.RelayerInfo:
+            data = await socketManager.relayInfo();
+            break;
         default:
           return Response.json({ error: 'Invalid event' }, { status: 400 });
       }

@@ -65,6 +65,9 @@ async function handleEvent(event: Event, req: Request, args: Record<string, stri
       }
       data = await socketManager.getBlockEvents(txHash);
       break;
+    case Event.RelayerInfo:
+      data = await socketManager.relayInfo();
+      break;
     default:
       return Response.json({ error: 'Invalid event' }, { status: 400 });
   }

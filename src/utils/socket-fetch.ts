@@ -16,7 +16,7 @@ export enum Event {
   ListChainInfo = 'ListChainInfo',
   GetChainBalance = 'GetChainBalance',
   GetBlockEvents = 'GetBlockEvents',
-  RelayInfo = 'RelayInfo',
+  RelayerInfo = 'RelayerInfo',
   FindChain = 'FindChain'
 }
 
@@ -178,7 +178,7 @@ class SocketManager extends EventEmitter {
   private readonly socketPath: string = process.env.NEXT_RELAYER_SOCKET_PATH || '/tmp/relayer/relay.sock';
   private retryCount: number = 0;
   private maxRetries: number = 3;
-  private baseRetryDelay: number = 1000;
+  private baseRetryDelay: number = 3000;
 
   constructor() {
     super();
@@ -301,7 +301,7 @@ class SocketManager extends EventEmitter {
     return this.sendRequest<BlockEvents[]>(Event.GetBlockEvents, data);
   }
   public async relayInfo(): Promise<RelayInfo> {
-    return this.sendRequest<RelayInfo>(Event.RelayInfo);
+    return this.sendRequest<RelayInfo>(Event.RelayerInfo);
   }
   public async findChain(chain: string): Promise<ChainInfo> {
     const data = { q: chain };
