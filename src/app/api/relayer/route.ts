@@ -15,15 +15,14 @@ async function handler(req: Request): Promise<Response> {
 
   const chain = url.searchParams.get('chain') || '';
 
-
   if (relayerId && relayerId != "self") {
-    const proxyRequest: ProxyRequest = {
-      relayerId: relayerId,
-      method: req.method,
-      body: req?.body,
-      args: Object.fromEntries(url.searchParams),
-    };
     try {
+      const proxyRequest: ProxyRequest = {
+        relayerId: relayerId,
+        method: req.method,
+        body: req.method === 'POST' ? await req.json() : undefined,
+        args: Object.fromEntries(url.searchParams),
+      };
       const proxyResponse = await Proxy(proxyRequest);
       return Response.json(proxyResponse);
     } catch (error: any) {
@@ -79,6 +78,10 @@ async function handler(req: Request): Promise<Response> {
           const chains = await req.json()
           data = await socketManager.getChainBalance(chains);
           break;
+        case Event.GetBlockEvents:
+            const { txHash: eventBlockHash } = await req.json()
+            data = await socketManager.getBlockEvents(eventBlockHash);
+            break;
         case Event.Metrics:
           data = await fetchMetrics()
           break;

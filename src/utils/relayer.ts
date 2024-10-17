@@ -158,13 +158,13 @@ export async function Proxy(request: ProxyRequest) {
         'Authorization': `Bearer ${relayer.token}`,
         'Content-Type': 'application/json',
       },
-      body: request?.body,
+      body: request.method === 'POST' ? JSON.stringify(request.body) : undefined,
     })
     const data = await response.json()
     return data
   } catch (error) {
     console.error(error)
-    throw new Error('Failed to proxy request to relayer')
+    throw new Error(`failed to proxy request to relayer ${request.relayerId}`)
   }
 }
 
@@ -193,9 +193,7 @@ export async function getEventMissedRelayer(txHash: string): Promise<MissedRelay
         return null;
       }
       for (const event of events) {
-        if (!event.executed) {
-          return { relayerId: 'self', name: "Self", txHash: txHash, data: event };
-        }
+        return { relayerId: 'self', name: "Self", txHash: txHash, data: event };
       }
       return null;
     } catch (error) {
