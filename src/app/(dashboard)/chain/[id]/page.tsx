@@ -2,7 +2,7 @@ import ChainDetails from '@/components/Page/Dashboard/ChainDetails';
 import { ChainInfoResponse } from '@/utils/socket-fetch';
 import { notFound } from 'next/navigation';
 
-const fetchChainInfo = async (id: string): Promise<ChainInfoResponse> => {
+const fetchChainInfo = async (id: string): Promise<ChainInfoResponse[]> => {
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
   const data = await fetch(`${BASE_URL}/relayer?chain=${id}&event=ListChainInfo`, {
     method: 'POST',
