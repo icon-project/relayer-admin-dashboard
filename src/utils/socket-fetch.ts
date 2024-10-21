@@ -112,6 +112,7 @@ export interface ChainInfoResponse {
   balance?: {
     amount: number;
     denom: string;
+    value: string;
   };
 };
 
@@ -122,6 +123,7 @@ export interface ChainBalanceResponse {
     amount: number;
     denom: string;
   };
+  value: string;
 };
 
 export interface RequestBalance {

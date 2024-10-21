@@ -33,7 +33,11 @@ export default async function Page() {
     let chainBalance = balance.find((b) => b.chain === chain.nid)
     return {
       ...chain,
-      balance: chainBalance?.balance
+      balance: {
+        amount: chainBalance?.balance?.amount || 0,
+        denom: chainBalance?.balance?.denom || '',
+        value: chainBalance?.value || ''
+      }
     }
   })
 
@@ -51,7 +55,7 @@ export default async function Page() {
                 <div>
                   {chain.nid}
                   <span className="fs-6 ms-2 fw-normal">
-                    ({chain.balance?.amount} {chain.balance?.denom}{' '}
+                    ({chain.balance?.value} {chain.balance?.denom}{' '}
                     <FontAwesomeIcon icon={faWallet} fixedWidth />
                     )
                   </span>
