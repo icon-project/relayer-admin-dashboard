@@ -12,10 +12,9 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'http',
-        hostname: 'localhost',
-        port: '3000',
-        pathname: '/assets/**',
+        protocol: 'https',
+        hostname: 'www.gravatar.com',
+        pathname: '/avatar/*',
       },
       {
         protocol: 'https',

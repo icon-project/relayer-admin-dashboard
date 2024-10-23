@@ -8,6 +8,7 @@ import {
   faPowerOff
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import crypto from 'crypto'
 import { getServerSession } from 'next-auth'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
@@ -22,6 +23,7 @@ import {
   Nav,
   NavItem,
 } from 'react-bootstrap'
+
 
 type ItemWithIconProps = {
   icon: IconDefinition;
@@ -38,6 +40,12 @@ const ItemWithIcon = (props: ItemWithIconProps) => {
   )
 }
 
+function getGravatarUrl(email, size = 80) {
+    const trimmedEmail = email.trim().toLowerCase();
+    const hash = crypto.createHash('sha256').update(trimmedEmail).digest('hex');
+    return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=identicon`;
+}
+
 export default async function HeaderProfileNav() {
   const session = await getServerSession(authOptions)
   const dict = await getDictionary()
@@ -52,9 +60,9 @@ export default async function HeaderProfileNav() {
                 fill
                 sizes="32px"
                 className="rounded-circle"
-                src={session.user.avatar}
-                alt={session.user.email}
-                fallbackSrc='/assets/img/avatar.png'
+                src={getGravatarUrl(session.user.email, 30)}
+                alt={session.user.name}
+                fallbackSrc='/assets/img/avatar.svg'
               />
             )}
           </div>
