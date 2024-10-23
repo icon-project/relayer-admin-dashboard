@@ -27,4 +27,7 @@ COPY public /usr/src/app/public
 
 USER bun
 EXPOSE 3000/tcp
+
+VOLUME /usr/src/app/.next
+
 ENTRYPOINT [ "bun", "server.js" ]
