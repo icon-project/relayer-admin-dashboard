@@ -22,7 +22,7 @@ export default async function middleware(request: NextRequest, event: NextFetchE
     '/login',
     '/api/auth/providers',
     '/api/auth/csrf',
-    '/api/auth/callback/',
+    '/api/auth/callback/credentials',
   ]
 
   if (!excludedPaths.includes(request.nextUrl.pathname)) {
@@ -40,10 +40,4 @@ export default async function middleware(request: NextRequest, event: NextFetchE
   }
 
   return response
-}
-export const config = {
-  matcher: [
-    "/api/event",
-    "/api/relayer"
-  ],
 }

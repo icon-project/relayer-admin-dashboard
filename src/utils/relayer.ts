@@ -73,17 +73,13 @@ export async function getRelayerInfoById(id: string): Promise<RelayerInfo> {
 }
 
 async function getCachedRelayerToken(relayerId: string): Promise<CachedToken> {
-  const cachedToken = tokenCache[relayerId];
-  const now = Date.now();
-  if (cachedToken && cachedToken.expiresAt > now) {
-    return cachedToken;
-  }
+  console.log('Cached token:', tokenCache[relayerId])
   const relayerToken = await getRelayerToken(relayerId);
   const expiresIn = 60 * 60 * 1000;
   const newCachedToken: CachedToken = {
     token: relayerToken.token,
     host: relayerToken.host,
-    expiresAt: now + expiresIn,
+    expiresAt: expiresIn,
   };
   tokenCache[relayerId] = newCachedToken;
   return newCachedToken;
@@ -92,32 +88,39 @@ async function getCachedRelayerToken(relayerId: string): Promise<CachedToken> {
 async function getRelayerToken(id: string): Promise<RelayerToken> {
   try {
     const relayer = await getRelayerById(id)
+    const { credentials } = await getProviders(id)
+    const { token, cookie } = await getCsrfToken(id)
+    console.log('Relayer:', token, cookie)
     const postBody = {
       email: relayer.auth.email,
       password: relayer.auth.password,
-      csrfToken: await getCsrfToken(id),
+      csrfToken: token,
     }
-    const { credentials } = await getProviders(id)
-    const response = await serverFetch(credentials.callbackUrl, {
+    console.log('Login body:', JSON.stringify(postBody))
+    const response = await fetch(credentials.callbackUrl, {
       method: 'POST',
+      credentials: 'include',
+      redirect: 'manual',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        'Cookie': `next-auth.csrf-token=${cookie}`,
       },
       body: JSON.stringify(postBody),
     })
-    const data = response.headers.get('Set-Cookie')
-    if (!data) {
-      throw new Error('Failed to get relayer token')
+    const headers = response.headers.get('Set-Cookie')
+    if (!headers) {
+      throw new Error('failed to get relayer token')
     }
-    const tokenMatch = data.match(/token=([^;]+);/)
+    console.log('Login headers:', headers)
+    const tokenMatch = headers.match(/session-token=([^;]+);/)
     if (!tokenMatch) {
-      throw new Error('Failed to get relayer token')
+      throw new Error('failed to find relayer token')
     }
-    const token = tokenMatch[1]
+    console.log('Relayer token:', tokenMatch[1])
+    const jwtToken = tokenMatch[1]
     return {
       id,
-      token: token,
+      token: jwtToken,
       host: relayer.host,
     }
   } catch (error: any) {
@@ -126,12 +129,28 @@ async function getRelayerToken(id: string): Promise<RelayerToken> {
   }
 }
 
-export async function getCsrfToken(relayerId: string): Promise<string> {
+interface CSRFResponse {
+  token: string;
+  cookie: string;
+}
+
+export async function getCsrfToken(relayerId: string): Promise<CSRFResponse> {
   try {
     const relayer = await getRelayerById(relayerId)
-    const response = await serverFetch(`${relayer.host}/api/auth/csrf`)
+    const response = await serverFetch(`${relayer.host}/api/auth/csrf`, {
+      method: 'GET',
+      credentials: 'include',
+    })
     const { csrfToken } = await response.json()
-    return csrfToken
+    const cookies = response.headers.get('Set-Cookie')
+    if (!csrfToken || !cookies) {
+      throw new Error('failed to get csrf token')
+    }
+    const csrfTokenMatch = cookies.match(/next-auth.csrf-token=([^;]+);/)
+    if (!csrfTokenMatch) {
+      throw new Error('failed to find csrf token')
+    }
+    return { token: csrfToken, cookie: csrfTokenMatch[1] }
   } catch (error) {
     throw new Error('Failed to get csrf token')
   }
@@ -154,9 +173,9 @@ export async function Proxy(request: ProxyRequest) {
     const url = `${relayer.host}/api/event?${new URLSearchParams(request.args).toString()}`
     const response = await serverFetch(url, {
       method: request.method,
+      credentials: 'include',
       headers: {
         'Authorization': `Bearer ${relayer.token}`,
-        'Content-Type': 'application/json',
       },
       body: request.method === 'POST' ? JSON.stringify(request.body) : undefined,
     })
