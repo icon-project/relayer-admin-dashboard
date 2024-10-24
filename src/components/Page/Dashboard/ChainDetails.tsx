@@ -10,8 +10,7 @@ interface ChainDetailsProps {
 }
 
 const fetchChainInfo = async (id: string): Promise<ChainInfoResponse> => {
-  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-  const data = await fetch(`${BASE_URL}/relayer?chain=${id}&event=ListChainInfo`, {
+  const data = await fetch(`/api/relayer?chain=${id}&event=ListChainInfo`, {
     method: 'POST',
     body: JSON.stringify({ chains: [id] }),
   }).then((res) => res.json());

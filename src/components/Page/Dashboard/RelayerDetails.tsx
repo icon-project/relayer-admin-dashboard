@@ -8,8 +8,7 @@ import { Card, CardBody, CardHeader, Table } from 'react-bootstrap';
 
 
 const fetchRelayer = async (id: string): Promise<RelayInfo> => {
-  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-  const data = await fetch(`${BASE_URL}/relayer?relayerId=${id}&event=RelayerInfo`).then((res) => res.json());
+  const data = await fetch(`/api/relayer?relayerId=${id}&event=RelayerInfo`).then((res) => res.json());
   if (!data) {
     return notFound();
   }
