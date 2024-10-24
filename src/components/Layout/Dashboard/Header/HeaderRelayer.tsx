@@ -1,6 +1,6 @@
 'use client'
 
-import { faTowerCell } from '@fortawesome/free-solid-svg-icons'
+import { faCheck, faTowerCell } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
@@ -42,7 +42,7 @@ export default function HeaderRelayer({ currentRelayerId, relayers }: HeaderRela
         <DropdownItem onClick={deleteSelection}>Current</DropdownItem>
         {relayers.map((relayer) => (
           <DropdownItem key={relayer.id} onClick={() => changeRelayer(relayer.id)} active={relayer.id === selectedRelayer}>
-            {relayer.name}
+            { relayer.id === selectedRelayer && <FontAwesomeIcon icon={faCheck} /> } {relayer.name}
           </DropdownItem>
         ))}
       </DropdownMenu>

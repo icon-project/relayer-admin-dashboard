@@ -73,7 +73,6 @@ export async function getRelayerInfoById(id: string): Promise<RelayerInfo> {
 }
 
 async function getCachedRelayerToken(relayerId: string): Promise<CachedToken> {
-  console.log('Cached token:', tokenCache[relayerId])
   const relayerToken = await getRelayerToken(relayerId);
   const expiresIn = 60 * 60 * 1000;
   const newCachedToken: CachedToken = {
@@ -90,13 +89,11 @@ async function getRelayerToken(id: string): Promise<RelayerToken> {
     const relayer = await getRelayerById(id)
     const { credentials } = await getProviders(id)
     const { token, cookie } = await getCsrfToken(id)
-    console.log('Relayer:', token, cookie)
     const postBody = {
       email: relayer.auth.email,
       password: relayer.auth.password,
       csrfToken: token,
     }
-    console.log('Login body:', JSON.stringify(postBody))
     const response = await fetch(credentials.callbackUrl, {
       method: 'POST',
       credentials: 'include',
@@ -111,7 +108,6 @@ async function getRelayerToken(id: string): Promise<RelayerToken> {
     if (!headers) {
       throw new Error('failed to get relayer token')
     }
-    console.log('Login headers:', headers)
     const tokenMatch = headers.match(/session-token=([^;]+);/)
     if (!tokenMatch) {
       throw new Error('failed to find relayer token')
@@ -124,7 +120,6 @@ async function getRelayerToken(id: string): Promise<RelayerToken> {
       host: relayer.host,
     }
   } catch (error: any) {
-    console.error(error)
     throw new Error('Failed to get relayer token')
   }
 }
