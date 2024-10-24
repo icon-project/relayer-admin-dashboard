@@ -1,30 +1,59 @@
+'use client'
+
 import { ChainInfoResponse } from '@/utils/socket-fetch';
-import React from 'react';
+import { notFound } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 
 interface ChainDetailsProps {
-  data: ChainInfoResponse;
+  id: string;
 }
 
-const ChainDetails: React.FC<ChainDetailsProps> = ({ data }) => {
+const fetchChainInfo = async (id: string): Promise<ChainInfoResponse> => {
+  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const data = await fetch(`${BASE_URL}/relayer?chain=${id}&event=ListChainInfo`, {
+    method: 'POST',
+    body: JSON.stringify({ chains: [id] }),
+  }).then((res) => res.json());
+  if (!data || data.length === 0) {
+    return notFound();
+  }
+  return data[0];
+}
+
+const ChainDetails: React.FC<ChainDetailsProps> = ({ id }) => {
+  const [chainInfo, setChainInfo] = useState<ChainInfoResponse | null>(null);
+
+  useEffect(() => {
+    const getChainInfo = async () => {
+      const data = await fetchChainInfo(id);
+      setChainInfo(data);
+    };
+    getChainInfo();
+  }, [id]);
+
+  if (!chainInfo) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div>
       <h1>Chain Details</h1>
-      <p>Name: {data.name}</p>
-      <p>NID: {data.nid}</p>
-      <p>Type: {data.type}</p>
-      <p>Address: {data.address}</p>
-      <p>Latest Height: {data.latestHeight}</p>
-      <p>Last CheckPoint: {data.lastCheckPoint}</p>
+      <p>Name: {chainInfo.name}</p>
+      <p>NID: {chainInfo.nid}</p>
+      <p>Type: {chainInfo.type}</p>
+      <p>Address: {chainInfo.address}</p>
+      <p>Latest Height: {chainInfo.latestHeight}</p>
+      <p>Last CheckPoint: {chainInfo.lastCheckPoint}</p>
       <div>
         <h2>Contracts</h2>
-        <p>XCall: {data.contracts.xcall}</p>
-        <p>Connection: {data.contracts.connection}</p>
+        <p>XCall: {chainInfo.contracts.xcall}</p>
+        <p>Connection: {chainInfo.contracts.connection}</p>
       </div>
-      {data.balance && (
+      {chainInfo.balance && (
         <div>
           <h2>Balance</h2>
-          <p>Amount: {data.balance.amount}</p>
-          <p>Denom: {data.balance.denom}</p>
+          <p>Amount: {chainInfo.balance.amount}</p>
+          <p>Denom: {chainInfo.balance.denom}</p>
         </div>
       )}
     </div>

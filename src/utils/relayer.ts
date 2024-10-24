@@ -73,15 +73,19 @@ export async function getRelayerInfoById(id: string): Promise<RelayerInfo> {
 }
 
 async function getCachedRelayerToken(relayerId: string): Promise<CachedToken> {
+  const cachedToken = tokenCache[relayerId];
+  if (cachedToken && cachedToken.expiresAt > Date.now()) {
+    return cachedToken;
+  }
   const relayerToken = await getRelayerToken(relayerId);
-  const expiresIn = 60 * 60 * 1000;
+  const expiresIn = Date.now() + 2 * 60 * 60 * 1000;
   const newCachedToken: CachedToken = {
     token: relayerToken.token,
     host: relayerToken.host,
     expiresAt: expiresIn,
   };
   tokenCache[relayerId] = newCachedToken;
-  return newCachedToken;
+  return tokenCache[relayerId];
 }
 
 async function getRelayerToken(id: string): Promise<RelayerToken> {
@@ -108,11 +112,10 @@ async function getRelayerToken(id: string): Promise<RelayerToken> {
     if (!headers) {
       throw new Error('failed to get relayer token')
     }
-    const tokenMatch = headers.match(/session-token=([^;]+);/)
+    const tokenMatch = headers.match(/next-auth.session-token=([^;]+);/)
     if (!tokenMatch) {
       throw new Error('failed to find relayer token')
     }
-    console.log('Relayer token:', tokenMatch[1])
     const jwtToken = tokenMatch[1]
     return {
       id,
@@ -120,7 +123,7 @@ async function getRelayerToken(id: string): Promise<RelayerToken> {
       host: relayer.host,
     }
   } catch (error: any) {
-    throw new Error('Failed to get relayer token')
+    throw new Error('failed to get relayer token')
   }
 }
 
