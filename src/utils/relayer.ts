@@ -24,6 +24,7 @@ interface RelayerConfig {
 
 type CachedToken = {
   token: string;
+  csrfToken: string;
   host: string;
   expiresAt: number;
 };
@@ -32,6 +33,7 @@ interface RelayerToken {
   id: string;
   token: string;
   host: string;
+  csrfToken: string;
 }
 
 export interface ProxyRequest {
@@ -81,6 +83,7 @@ async function getCachedRelayerToken(relayerId: string): Promise<CachedToken> {
   const expiresIn = Date.now() + 2 * 60 * 60 * 1000;
   const newCachedToken: CachedToken = {
     token: relayerToken.token,
+    csrfToken: relayerToken.csrfToken,
     host: relayerToken.host,
     expiresAt: expiresIn,
   };
@@ -92,25 +95,27 @@ async function getRelayerToken(id: string): Promise<RelayerToken> {
   try {
     const relayer = await getRelayerById(id)
     const { credentials } = await getProviders(id)
-    const { token, cookie } = await getCsrfToken(id)
+    const { token, cookie, isSecure } = await getCsrfToken(id)
     const postBody = {
       email: relayer.auth.email,
       password: relayer.auth.password,
       csrfToken: token,
     }
+    const csrfCookie = `next-auth.csrf-token=${cookie};`
+    const cookies = isSecure ? `__Host-${csrfCookie}` : csrfCookie
     const response = await fetch(credentials.callbackUrl, {
       method: 'POST',
       credentials: 'include',
       redirect: 'manual',
       headers: {
         'Content-Type': 'application/json',
-        'Cookie': `next-auth.csrf-token=${cookie}`,
+        'Cookie': cookies,
       },
       body: JSON.stringify(postBody),
     })
     const headers = response.headers.get('Set-Cookie')
     if (!headers) {
-      throw new Error('failed to get relayer token')
+      throw new Error(`failed to get relayer token for ${relayer.id} ${response.status}`)
     }
     const tokenMatch = headers.match(/next-auth.session-token=([^;]+);/)
     if (!tokenMatch) {
@@ -121,15 +126,17 @@ async function getRelayerToken(id: string): Promise<RelayerToken> {
       id,
       token: jwtToken,
       host: relayer.host,
+      csrfToken: cookies,
     }
   } catch (error: any) {
-    throw new Error('failed to get relayer token')
+    throw new Error(`failed to get relayer token for ${id} ${error}`)
   }
 }
 
 interface CSRFResponse {
   token: string;
   cookie: string;
+  isSecure: boolean;
 }
 
 export async function getCsrfToken(relayerId: string): Promise<CSRFResponse> {
@@ -148,9 +155,10 @@ export async function getCsrfToken(relayerId: string): Promise<CSRFResponse> {
     if (!csrfTokenMatch) {
       throw new Error('failed to find csrf token')
     }
-    return { token: csrfToken, cookie: csrfTokenMatch[1] }
+    const isSecure = cookies?.includes('__Secure-')
+    return { token: csrfToken, cookie: csrfTokenMatch[1], isSecure }
   } catch (error) {
-    throw new Error('Failed to get csrf token')
+    throw new Error(`failed to get csrf token for relayer ${relayerId} ${error}`)
   }
 }
 
@@ -174,6 +182,8 @@ export async function Proxy(request: ProxyRequest) {
       credentials: 'include',
       headers: {
         'Authorization': `Bearer ${relayer.token}`,
+        'Content-Type': 'application/json',
+        'Cookies': relayer.csrfToken,
       },
       body: request.method === 'POST' ? JSON.stringify(request.body) : undefined,
     })
