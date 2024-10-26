@@ -12,7 +12,7 @@ interface RelayerInfo {
   name: string;
 }
 
-interface RelayerConfig {
+export interface RelayerConfig {
   id: string;
   name: string;
   host: string;
@@ -22,7 +22,7 @@ interface RelayerConfig {
   };
 }
 
-type CachedToken = {
+interface CachedToken {
   token: string;
   csrfToken: string;
   host: string;
@@ -50,13 +50,13 @@ interface ProviderResponse {
 }
 
 export async function readRelayers(): Promise<RelayerConfig[]> {
+  const relayersPath = process.env.NEXT_RELAYERS_MAP_FILE || path.join(process.cwd(), 'relayers.json')
   try {
-    const relayersPath = process.env.NEXT_RELAYERS_MAP_FILE || path.join(process.cwd(), 'relayers.json')
     const relayersJson = await fs.readFile(relayersPath, 'utf8')
     const relayers: RelayerConfig[] = JSON.parse(relayersJson)
     return relayers
   } catch (error) {
-    throw new Error('Failed to load relayers')
+      throw new Error('Failed to read relayers')
   }
 }
 

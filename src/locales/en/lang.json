@@ -89,6 +89,14 @@
     "title": "Relayer",
     "add_new": "Add new",
     "view_all": "View all",
+    "relayers": "Relayers",
+    "form": {
+      "name": "Name",
+      "host": "Host",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Add"
+    },
     "attribute": {
       "name": "Name",
       "chain": "Type",
@@ -98,8 +106,7 @@
   "featured_nav": {
     "dashboard": "Dashboard",
     "users": "Users",
-    "settings": "Settings",
-    "relayers": "Relayers"
+    "settings": "Settings"
   },
   "notification": {
     "message": "You have {{total}} notifications",
@@ -171,7 +178,9 @@
         "profile": "Profile",
         "settings": "Settings",
         "payments": "Payments",
-        "projects": "Projects"
+        "projects": "Projects",
+        "relayers": "Relayers",
+        "users": "Users"
       }
     },
     "lock_account": "Lock account",

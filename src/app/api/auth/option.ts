@@ -1,16 +1,8 @@
 import { getDictionary } from '@/locales/dictionary'
-import fs from 'fs/promises'
+import { readUsers } from '@/utils/user'
 import { SignJWT, jwtVerify } from 'jose'
 import { NextAuthOptions, User } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import path from 'path'
-
-async function loadUsers(): Promise<User[]> {
-  const usersPath = process.env.NEXT_USERS_LIST_PATH || path.join(process.cwd(), 'users.json')
-  const usersJson = await fs.readFile(usersPath, 'utf8')
-  const users: User[] = JSON.parse(usersJson)
-  return users
-}
 
 export const authOptions: NextAuthOptions = {
   callbacks: {
@@ -44,7 +36,7 @@ export const authOptions: NextAuthOptions = {
 }
 
 export async function authenticate(email: string, password: string): Promise<User> {
-  const users = await loadUsers()
+  const users = await readUsers()
   const user = users.find((u: User) => u.email === email && u.password === password)
   const dict = await getDictionary()
   if (!user) {

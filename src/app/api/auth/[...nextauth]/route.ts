@@ -3,11 +3,10 @@ import NextAuth, { User } from 'next-auth';
 
 declare module 'next-auth' {
   interface User {
-    id: number;
+    id: string;
     name: string;
     email: string;
     password: string | null;
-    avatar: string;
     company: string;
     designation: string;
   }
