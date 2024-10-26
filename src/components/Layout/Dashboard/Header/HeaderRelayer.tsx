@@ -23,13 +23,13 @@ export default function HeaderRelayer({ currentRelayerId, relayers }: HeaderRela
   const router = useRouter()
 
   const changeRelayer = (id: string) => {
-    Cookies.set('relayerId', id)
-    setRelayer(id)
-    router.refresh()
-  }
-
-  const deleteSelection = () => {
-    Cookies.remove('relayerId')
+    if (id === selectedRelayer) {
+      Cookies.remove('relayerId')
+      setRelayer('')
+    } else {
+      Cookies.set('relayerId', id)
+      setRelayer(id)
+    }
     router.refresh()
   }
 
@@ -39,7 +39,6 @@ export default function HeaderRelayer({ currentRelayerId, relayers }: HeaderRela
         <FontAwesomeIcon icon={faTowerCell} size="lg" />
       </DropdownToggle>
       <DropdownMenu className="pt-0" align="end">
-        <DropdownItem onClick={deleteSelection}>Current</DropdownItem>
         {relayers.map((relayer) => (
           <DropdownItem key={relayer.id} onClick={() => changeRelayer(relayer.id)} active={relayer.id === selectedRelayer}>
             { relayer.id === selectedRelayer && <FontAwesomeIcon icon={faCheck} /> } {relayer.name}

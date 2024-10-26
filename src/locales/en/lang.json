@@ -47,6 +47,7 @@
   "dashboard": {
     "action": {
         "reset": "Reset",
+        "relay": "Manual Relay",
         "view": "View"
     },
     "utilization": {
@@ -97,7 +98,8 @@
   "featured_nav": {
     "dashboard": "Dashboard",
     "users": "Users",
-    "settings": "Settings"
+    "settings": "Settings",
+    "relayers": "Relayers"
   },
   "notification": {
     "message": "You have {{total}} notifications",

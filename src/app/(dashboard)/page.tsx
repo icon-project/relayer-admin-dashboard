@@ -5,6 +5,7 @@ import XcallStats from "@/components/Page/Dashboard/XcallStats"
 import { getDictionary } from '@/locales/dictionary'
 import fetchMetrics, { SystemMetrics } from '@/utils/metrics'
 import { socketManager } from '@/utils/socket-fetch'
+
 import {
   faEllipsisVertical,
   faWallet
@@ -40,17 +41,19 @@ export default async function Page() {
       }
     }
   })
+  const colors = ['primary', 'success', 'danger', 'warning', 'info'];
 
   return (
     <Suspense fallback={<Loading />}>
       <div className="row">
-        { chains.map((chain) => (
+        { chains.map((chain, index) => (
         <div className="col-sm-6 col-lg-3 justify-content-center" key={chain.nid}>
-          <Card bg="primary" text="white" className="mb-4">
+          <Card bg={colors[index % colors.length]} text="white" className="mb-4">
             <CardBody className="pb-0 d-flex justify-content-between align-items-start">
               <div>
                 <div className="fs-4 fw-semibold">
-                  {chain.name} <span className="fs-6 ms-2 fw-normal">({chain.type})</span>
+                  <Link href={`/chain/${chain.nid}`} passHref className="text-white">
+                  {chain.name}</Link> <span className="fs-6 ms-2 fw-normal">({chain.type})</span>
                 </div>
                 <div>
                   {chain.nid}
@@ -71,7 +74,9 @@ export default async function Page() {
                   <FontAwesomeIcon fixedWidth icon={faEllipsisVertical} />
                 </DropdownToggle>
                 <DropdownMenu>
-                  <DropdownItem href="#/action-1">{dict.dashboard.action.reset}</DropdownItem>
+                  <DropdownItem as={Link} href={`/chain/${chain.nid}/relay`}>
+                      {dict.dashboard.action.relay}
+                    </DropdownItem>
                   <DropdownItem as={Link} href={`/chain/${chain.nid}`}>{dict.dashboard.xcall.actions.view}</DropdownItem>
                 </DropdownMenu>
               </Dropdown>

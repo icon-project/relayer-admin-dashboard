@@ -7,7 +7,7 @@ import {
 } from '@fortawesome/free-regular-svg-icons'
 import {
   faGauge,
-  faPuzzlePiece
+  faTowerCell
 } from '@fortawesome/free-solid-svg-icons'
 import { PropsWithChildren } from 'react'
 
@@ -24,7 +24,7 @@ export default async function SidebarNav() {
       <SidebarNavItem icon={faGauge} href="/">
         {dict.sidebar.items.dashboard}
       </SidebarNavItem>
-      <SidebarNavGroup toggleIcon={faPuzzlePiece} toggleText={dict.sidebar.items.relayers}>
+      <SidebarNavGroup toggleIcon={faTowerCell} toggleText={dict.sidebar.items.relayers}>
       {relayers.map((relayer) => (
           <SidebarNavItem key={relayer.id} href={`/relayer/${relayer.id}`}>{relayer.name}</SidebarNavItem>
       ))}

@@ -49,7 +49,7 @@ interface ProviderResponse {
   };
 }
 
-export async function loadRelayer(): Promise<RelayerConfig[]> {
+export async function readRelayers(): Promise<RelayerConfig[]> {
   try {
     const relayersPath = process.env.NEXT_RELAYERS_MAP_FILE || path.join(process.cwd(), 'relayers.json')
     const relayersJson = await fs.readFile(relayersPath, 'utf8')
@@ -60,8 +60,47 @@ export async function loadRelayer(): Promise<RelayerConfig[]> {
   }
 }
 
+export async function addRelayer(relayer: RelayerConfig): Promise<RelayerConfig> {
+  try {
+    const relayers = await readRelayers()
+    relayers.push(relayer)
+    const relayersPath = process.env.NEXT_RELAYERS_MAP_FILE || path.join(process.cwd(), 'relayers.json')
+    await fs.writeFile(relayersPath, JSON.stringify(relayers, null, 2), 'utf8')
+    return relayer
+  } catch (error) {
+    throw new Error('Failed to add relayer')
+  }
+}
+
+export async function updateRelayer(relayer: RelayerConfig): Promise<RelayerConfig> {
+  try {
+    const relayers = await readRelayers()
+    const index = relayers.findIndex((r: RelayerConfig) => r.id === relayer.id)
+    if (index === -1) {
+      throw new Error('Relayer not found')
+    }
+    relayers[index] = relayer
+    const relayersPath = process.env.NEXT_RELAYERS_MAP_FILE || path.join(process.cwd(), 'relayers.json')
+    await fs.writeFile(relayersPath, JSON.stringify(relayers, null, 2), 'utf8')
+    return relayer
+  } catch (error) {
+    throw new Error('Failed to update relayer')
+  }
+}
+
+export async function deleteRelayer(id: string): Promise<void> {
+  try {
+    const relayers = await readRelayers()
+    const filteredRelayers = relayers.filter((r: RelayerConfig) => r.id !== id)
+    const relayersPath = process.env.NEXT_RELAYERS_MAP_FILE || path.join(process.cwd(), 'relayers.json')
+    await fs.writeFile(relayersPath, JSON.stringify(filteredRelayers, null, 2), 'utf8')
+  } catch (error) {
+    throw new Error('Failed to delete relayer')
+  }
+}
+
 export async function getRelayerById(id: string): Promise<RelayerConfig> {
-  const relayers = await loadRelayer()
+  const relayers = await readRelayers()
   const relayer = relayers.find((r: RelayerConfig) => r.id === id)
   if (!relayer) {
     throw new Error('Relayer not found')
@@ -196,7 +235,7 @@ export async function Proxy(request: ProxyRequest) {
 }
 
 export async function getAvailableRelayers(): Promise<{ id: string, name: string }[]> {
-  const relayers = await loadRelayer()
+  const relayers = await readRelayers()
   return relayers.map((r: RelayerConfig) => ({ id: r.id, name: r.name }))
 }
 
