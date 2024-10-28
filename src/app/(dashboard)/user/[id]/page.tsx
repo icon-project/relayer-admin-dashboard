@@ -2,14 +2,6 @@ import UserEditForm from '@/components/Page/Dashboard/UserEditForm'
 import { getUserById } from '@/utils/user'
 import { Col, Container, Row } from 'react-bootstrap'
 
-interface User {
-    id: number
-    email: string
-    password: string
-    company: string
-    designation: string
-}
-
 export default async function Page({ params }: { params: { id: string } }) {
     const id = params.id
     const user = await getUserById(id)
