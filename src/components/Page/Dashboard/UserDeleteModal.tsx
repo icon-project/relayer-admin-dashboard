@@ -1,15 +1,7 @@
 'use client'
 
+import { User } from '@/utils/user'
 import { Button, Modal } from 'react-bootstrap'
-
-interface User {
-    id: number
-    name: string
-    email: string
-    password: string
-    company: string
-    designation: string
-}
 
 interface UserDeleteModalProps {
     user: User | null
