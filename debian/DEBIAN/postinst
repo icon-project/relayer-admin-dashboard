@@ -11,10 +11,10 @@ else
 fi
 
 # Set permissions for the application directory
-chown -R dashboard:dashboard /usr/src/dashboard
+chown -R dashboard:dashboard /usr/share/dashboard
 
 # Ensure the startup script is executable
-chmod +x /usr/src/dashboard/start.sh
+chmod +x /usr/share/dashboard/start.sh
 
 # Install bun.js
 curl -fsSL https://bun.sh/install | BUN_INSTALL="/tmp" bash
