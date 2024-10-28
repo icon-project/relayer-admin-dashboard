@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 
-const usersFilePath = process.env.NEXT_USERS_FILE || path.join(process.cwd(), 'users.json');
+const usersFilePath = process.env.NEXT_USERS_MAP_FILE_PATH || path.join(process.cwd(), 'users.json');
 
 export interface User {
   id: string;

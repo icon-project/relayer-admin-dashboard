@@ -4,6 +4,14 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(req: NextRequest) {
   try {
     const relayers = await readRelayers();
+    const id = new URLSearchParams(req.url).get('id');
+    if (id) {
+      const relayer = relayers.find((r) => r.id === id);
+      if (!relayer) {
+        return NextResponse.json({ error: 'Relayer not found' }, { status: 404 });
+      }
+      return NextResponse.json(relayer);
+    }
     return NextResponse.json(relayers);
   } catch (e: any) {
     return Response.json({ error: e.message }, { status: 500 });

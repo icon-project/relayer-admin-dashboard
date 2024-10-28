@@ -50,7 +50,7 @@ interface ProviderResponse {
 }
 
 export async function readRelayers(): Promise<RelayerConfig[]> {
-  const relayersPath = process.env.NEXT_RELAYERS_MAP_FILE || path.join(process.cwd(), 'relayers.json')
+  const relayersPath = process.env.NEXT_RELAYERS_MAP_FILE_PATH || path.join(process.cwd(), 'relayers.json')
   try {
     const relayersJson = await fs.readFile(relayersPath, 'utf8')
     const relayers: RelayerConfig[] = JSON.parse(relayersJson)
