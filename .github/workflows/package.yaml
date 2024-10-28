@@ -27,6 +27,15 @@ jobs:
       - name: Build Next.js application
         run: bun run build
 
+      - name: Extract version from tag
+        id: extract_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: Update control file version
+        run: |
+          sed -i "s/^Version: .*/Version: ${VERSION}/" debian/DEBIAN/control
+          cat debian/DEBIAN/control
+
       - name: Prepare Debian package structure
         run: |
           cp -r .next/standalone debian/usr/src/dashboard
