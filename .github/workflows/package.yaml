@@ -31,11 +31,6 @@ jobs:
           cp -r public debian/usr/src/dashboard
           cp $(which bun) debian/usr/src/dashboard/bin/bun
 
-      - name: Copy control file
-        run: |
-          mkdir -p debian/DEBIAN
-          cp debian/DEBIAN/control debian/DEBIAN/control
-
       - name: Build Debian package
         run: dpkg-deb --build debian relayer-admin-dashboard.deb
 
