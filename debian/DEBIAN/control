@@ -3,6 +3,5 @@ Version: 1.0.0
 Section: web
 Priority: optional
 Architecture: amd64
-Depends: bun
 Maintainer: Debendra <mail@debendra.me>
-Description: Relayer admin dashboard
+Description: Relayer admin dashboard for managing relayers
