@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e
+
+# Add a new user
+if ! id "dashboard" &>/dev/null; then
+    useradd -m -s /bin/bash dashboard
+    echo "User dashboard created."
+else
+    echo "User dashboard already exists."
+fi
+
+# Set permissions for the application directory
+chown -R dashboard:dashboard /usr/src/dashboard
+
+# Ensure the startup script is executable
+chmod +x /usr/src/dashboard/start.sh
+
+exit 0
