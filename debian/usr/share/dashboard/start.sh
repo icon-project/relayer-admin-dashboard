@@ -1,3 +1,3 @@
 #!/bin/bash
 
-bun run server.js
+bun run /usr/share/dashboard/server.js
