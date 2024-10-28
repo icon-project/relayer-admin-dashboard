@@ -2,12 +2,15 @@ name: Release Debian package
 
 on:
   push:
-    branches:
-      - main
     tags:
       - "v*.*.*" # run on semver tags
       - "v*.*.*-*" # run on pre-release tags
   workflow_dispatch:
+
+permissions:
+  packages: write
+  contents: write
+  discussions: write
 
 jobs:
   build:
@@ -39,3 +42,11 @@ jobs:
         with:
           name: relayer-admin-dashboard-debian
           path: relayer-admin-dashboard.deb
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: relayer-admin-dashboard.deb
+          generate_release_notes: true
+          make_latest: true
+          prerelease: ${{ contains(github.ref, '-') }}
