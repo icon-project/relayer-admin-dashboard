@@ -1,3 +1,3 @@
 #!/bin/bash
 
-bun run /usr/share/dashboard/server.js
+bun run --cwd /usr/share/dashboard server.js
