@@ -28,7 +28,7 @@ jobs:
         run: |
           mkdir -p debian/usr/src/dashboard/{.next,public,bin}
           cp -r .next/standalone debian/usr/src/dashboard
-          cp -r .next/static debian/usr/src/app/.next
+          cp -r .next/static debian/usr/src/dashboard/.next
           cp -r public debian/usr/src/dashboard
           cp $(which bun) debian/usr/src/dashboard/bin/bun
           cp debian/DEBIAN/start.sh debian/usr/src/dashboard/start.sh
