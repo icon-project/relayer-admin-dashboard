@@ -10,9 +10,6 @@ else
     echo "User dashboard already exists."
 fi
 
-# Set permissions for the application directory
-chown -R dashboard:dashboard /usr/share/dashboard
-
 # Ensure the startup script is executable
 chmod +x /usr/share/dashboard/start.sh
 
