@@ -38,7 +38,7 @@ jobs:
 
       - name: Prepare Debian package structure
         run: |
-          cp -r .next/standalone debian/usr/share/dashboard
+          cp -r .next/standalone/* debian/usr/share/dashboard
           cp -r .next/static debian/usr/share/dashboard/.next
           cp -r public debian/usr/share/dashboard
 
