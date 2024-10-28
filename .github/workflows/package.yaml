@@ -41,7 +41,6 @@ jobs:
           cp -r .next/standalone debian/usr/src/dashboard
           cp -r .next/static debian/usr/src/dashboard/.next
           cp -r public debian/usr/src/dashboard
-          cp $(which bun) debian/usr/src/dashboard/bin/bun
 
       - name: Build Debian package
         run: dpkg-deb --build debian relayer-admin-dashboard.deb

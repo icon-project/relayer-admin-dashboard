@@ -16,4 +16,8 @@ chown -R dashboard:dashboard /usr/src/dashboard
 # Ensure the startup script is executable
 chmod +x /usr/src/dashboard/start.sh
 
+# Install bun.js
+curl -fsSL https://bun.sh/install | BUN_INSTALL="/tmp" bash
+mv /tmp/bin/bun /usr/local/bin/bun
+
 exit 0
