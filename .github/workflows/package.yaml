@@ -1,0 +1,52 @@
+name: Release Debian package
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*.*.*" # run on semver tags
+      - "v*.*.*-*" # run on pre-release tags
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up bun.js
+        run: |
+          curl -fsSL https://bun.sh/install | bash
+          export BUN_INSTALL="$HOME/.bun"
+          export PATH="$BUN_INSTALL/bin:$PATH"
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build Next.js application
+        run: bun run build
+
+      - name: Prepare Debian package structure
+        run: |
+          mkdir -p debian/usr/src/dashboard/{.next,public,bin}
+          cp -r .next/standalone debian/usr/src/dashboard
+          cp -r .next/static debian/usr/src/app/.next
+          cp -r public debian/usr/src/dashboard
+          cp $(which bun) debian/usr/src/dashboard/bin/bun
+          cp debian/DEBIAN/start.sh debian/usr/src/dashboard/start.sh
+
+      - name: Copy control file
+        run: |
+          mkdir -p debian/DEBIAN
+          cp debian/DEBIAN/control debian/DEBIAN/control
+
+      - name: Build Debian package
+        run: dpkg-deb --build debian relayer-admin-dashboard.deb
+
+      - name: Upload Debian package
+        uses: actions/upload-artifact@v3
+        with:
+          name: relayer-admin-dashboard-debian
+          path: relayer-admin-dashboard.deb
