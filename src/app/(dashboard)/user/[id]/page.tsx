@@ -11,7 +11,7 @@ interface User {
 }
 
 export default async function Page({ params }: { params: { id: string } }) {
-    const id = Number(params.id)
+    const id = params.id
     const user = await getUserById(id)
 
     return (
