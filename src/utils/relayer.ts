@@ -80,7 +80,6 @@ export async function updateRelayer(relayer: RelayerConfig): Promise<RelayerConf
       throw new Error('Relayer not found')
     }
     relayers[index] = relayer
-    const relayersPath = process.env.NEXT_RELAYERS_MAP_FILE || path.join(process.cwd(), 'relayers.json')
     await fs.writeFile(relayersPath, JSON.stringify(relayers, null, 2), 'utf8')
     return relayer
   } catch (error) {

@@ -30,12 +30,7 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   try {
     const updatedRelayer = await req.json();
-    const relayers = await readRelayers();
-    const relayer = relayers.find((r) => r.id === updatedRelayer.id);
-    if (!relayer) {
-      return Response.json({ error: 'Relayer not found' }, { status: 404 });
-    }
-    const updated = await updateRelayer({ ...relayer, ...updatedRelayer });
+    const updated = await updateRelayer(updatedRelayer);
     return Response.json(updated);
   } catch (e: any) {
     return Response.json({ error: e.message }, { status: 500 });
