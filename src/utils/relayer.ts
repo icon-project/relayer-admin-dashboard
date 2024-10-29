@@ -5,6 +5,8 @@ import serverFetch from './server-fetch';
 import { BlockEvents, socketManager } from './socket-fetch';
 
 
+const relayersPath = process.env.NEXT_RELAYERS_MAP_FILE_PATH || path.join(process.cwd(), 'relayers.json')
+
 const tokenCache: { [relayerId: string]: CachedToken } = {};
 
 interface RelayerInfo {
@@ -50,7 +52,6 @@ interface ProviderResponse {
 }
 
 export async function readRelayers(): Promise<RelayerConfig[]> {
-  const relayersPath = process.env.NEXT_RELAYERS_MAP_FILE_PATH || path.join(process.cwd(), 'relayers.json')
   try {
     const relayersJson = await fs.readFile(relayersPath, 'utf8')
     const relayers: RelayerConfig[] = JSON.parse(relayersJson)
@@ -64,11 +65,10 @@ export async function addRelayer(relayer: RelayerConfig): Promise<RelayerConfig>
   try {
     const relayers = await readRelayers()
     relayers.push(relayer)
-    const relayersPath = process.env.NEXT_RELAYERS_MAP_FILE || path.join(process.cwd(), 'relayers.json')
     await fs.writeFile(relayersPath, JSON.stringify(relayers, null, 2), 'utf8')
     return relayer
   } catch (error) {
-    throw new Error('Failed to add relayer')
+    throw new Error(`Failed to add relayer ${error}`)
   }
 }
 
@@ -92,7 +92,6 @@ export async function deleteRelayer(id: string): Promise<void> {
   try {
     const relayers = await readRelayers()
     const filteredRelayers = relayers.filter((r: RelayerConfig) => r.id !== id)
-    const relayersPath = process.env.NEXT_RELAYERS_MAP_FILE || path.join(process.cwd(), 'relayers.json')
     await fs.writeFile(relayersPath, JSON.stringify(filteredRelayers, null, 2), 'utf8')
   } catch (error) {
     throw new Error('Failed to delete relayer')

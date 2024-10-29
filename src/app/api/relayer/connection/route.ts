@@ -1,23 +1,22 @@
 import { addRelayer, deleteRelayer, readRelayers, updateRelayer } from '@/utils/relayer';
 import crypto from 'crypto';
-import { NextRequest, NextResponse } from 'next/server';
-export async function GET(req: NextRequest) {
+export async function GET(req: Request) {
   try {
     const relayers = await readRelayers();
     const id = new URLSearchParams(req.url).get('id');
     if (id) {
       const relayer = relayers.find((r) => r.id === id);
       if (!relayer) {
-        return NextResponse.json({ error: 'Relayer not found' }, { status: 404 });
+        return Response.json({ error: 'Relayer not found' }, { status: 404 });
       }
-      return NextResponse.json(relayer);
+      return Response.json(relayer);
     }
-    return NextResponse.json(relayers);
+    return Response.json(relayers);
   } catch (e: any) {
     return Response.json({ error: e.message }, { status: 500 });
   }
 }
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
     const newRelayer = await req.json();
     const id = crypto.randomUUID();
@@ -28,7 +27,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function PUT(req: NextRequest) {
+export async function PUT(req: Request) {
   try {
     const updatedRelayer = await req.json();
     const relayers = await readRelayers();
@@ -43,7 +42,7 @@ export async function PUT(req: NextRequest) {
   }
 }
 
-export async function DELETE(req: NextRequest) {
+export async function DELETE(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');

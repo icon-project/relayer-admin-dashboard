@@ -10,7 +10,7 @@
     "forgot_password": "Forgot password?",
     "signup": {
       "title": "Sign up",
-      "description": "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\ntempor incididunt ut labore et dolore magna aliqua."
+      "description": "Don't have an account?\nAsk admin to create one for you."
     },
     "message": {
       "auth_failed": "Invalid email or password"
