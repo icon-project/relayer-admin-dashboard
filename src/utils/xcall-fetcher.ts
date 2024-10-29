@@ -114,13 +114,27 @@ interface MessageFilter {
   dest_network?: string;
   skip?: number;
   limit?: number;
+  from_timestamp?: string | null;
+  to_timestamp?: string | null;
 }
 
 export async function fetchMessages(filter: MessageFilter): Promise<MessagesResponse> {
-  const { status, src_network, dest_network, limit = 10 } = filter;
-  const url = `${BASE_URL}/messages?status=${status}&limit=${limit}&src_network=${src_network}&dest_network=${dest_network}&skip=${filter.skip || 0}`;
-  const response = await serverFetch(url);
-  return response.json();
+  try {
+    const { status, src_network, dest_network, limit = 10, skip = 0, from_timestamp, to_timestamp } = filter;
+    const url = new URL(`${BASE_URL}/messages`);
+    url.searchParams.append('status', status || '');
+    url.searchParams.append('limit', limit.toString());
+    url.searchParams.append('skip', skip.toString());
+    if (src_network) url.searchParams.append('src_network', src_network);
+    if (dest_network) url.searchParams.append('dest_network', dest_network);
+    if (from_timestamp) url.searchParams.append('from_timestamp', from_timestamp);
+    if (to_timestamp) url.searchParams.append('to_timestamp', to_timestamp);
+    console.log(url.toString());
+    const response = await serverFetch(url.toString());
+    return response.json();
+  } catch (error: any) {
+    throw new Error(`failed to fetch messages: ${error.message}`);
+  }
 }
 
 export async function fetchMessageById(id: number): Promise<MessageByIdResponse> {

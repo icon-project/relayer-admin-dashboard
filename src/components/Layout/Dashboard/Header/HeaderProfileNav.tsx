@@ -4,18 +4,13 @@ import HeaderLogout from '@/components/Layout/Dashboard/Header/HeaderLogout'
 import { getDictionary } from '@/locales/dictionary'
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 import { faUser } from '@fortawesome/free-regular-svg-icons'
-import {
-    faListCheck,
-    faPowerOff,
-    faTowerCell,
-} from '@fortawesome/free-solid-svg-icons'
+import { faPowerOff, faTowerCell } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import crypto from 'crypto'
 import { getServerSession } from 'next-auth'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import {
-    Badge,
     Dropdown,
     DropdownDivider,
     DropdownHeader,
@@ -77,16 +72,6 @@ export default async function HeaderProfileNav() {
                     <DropdownHeader className="fw-bold rounded-top">
                         {dict.profile.account.title}
                     </DropdownHeader>
-                    <Link href="#" passHref legacyBehavior>
-                        <DropdownItem>
-                            <ItemWithIcon icon={faListCheck}>
-                                {dict.profile.account.items.tasks}
-                                <Badge bg="danger" className="ms-2">
-                                    42
-                                </Badge>
-                            </ItemWithIcon>
-                        </DropdownItem>
-                    </Link>
 
                     <DropdownHeader className="fw-bold">
                         {dict.profile.settings.title}
