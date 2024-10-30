@@ -31,7 +31,7 @@ export default function HeaderRelayer({ currentRelayerId, relayers }: HeaderRela
     }
 
     return (
-        relayers.length > 1 && (
+        relayers.length > 0 && (
             <Dropdown>
                 <DropdownToggle
                     className="px-2 mx-1 px-sm-3 mx-sm-0"
