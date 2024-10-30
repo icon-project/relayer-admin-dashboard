@@ -114,8 +114,8 @@ interface MessageFilter {
   dest_network?: string;
   skip?: number;
   limit?: number;
-  from_timestamp?: string | null;
-  to_timestamp?: string | null;
+  from_timestamp?: number | null;
+  to_timestamp?: number | null;
 }
 
 export async function fetchMessages(filter: MessageFilter): Promise<MessagesResponse> {
@@ -127,8 +127,8 @@ export async function fetchMessages(filter: MessageFilter): Promise<MessagesResp
     url.searchParams.append('skip', skip.toString());
     if (src_network) url.searchParams.append('src_network', src_network);
     if (dest_network) url.searchParams.append('dest_network', dest_network);
-    if (from_timestamp) url.searchParams.append('from_timestamp', from_timestamp);
-    if (to_timestamp) url.searchParams.append('to_timestamp', to_timestamp);
+    if (from_timestamp) url.searchParams.append('from_timestamp', from_timestamp.toString());
+    if (to_timestamp) url.searchParams.append('to_timestamp', to_timestamp.toString());
     console.log(url.toString());
     const response = await serverFetch(url.toString());
     return response.json();

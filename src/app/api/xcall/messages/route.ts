@@ -1,12 +1,11 @@
 import { fetchMessages, MessageFilter, MessageStatus } from '@/utils/xcall-fetcher';
 
 
-const getTimestamp = (dateTime: string): string => {
+const getTimestamp = (dateTime: string | null): number | null => {
   if (!dateTime || dateTime === '0') {
-    return '';
+    return null;
   }
-  const ms = parseInt(dateTime, 10) / 1000;
-  return `${ms}`;
+  return parseInt(dateTime, 10) / 1000;
 }
 
 export async function GET(req: Request): Promise<Response> {
@@ -18,8 +17,8 @@ export async function GET(req: Request): Promise<Response> {
     status: url.searchParams.get('status') as MessageStatus,
     limit: parseInt(url.searchParams.get('limit') || '10', 10),
     skip: parseInt(url.searchParams.get('skip') || '0', 0),
-    from_timestamp: getTimestamp(url.searchParams.get('from_timestamp') || ''),
-    to_timestamp: getTimestamp(url.searchParams.get('to_timestamp') || ''),
+    from_timestamp: getTimestamp(url.searchParams.get('from_timestamp')),
+    to_timestamp: getTimestamp(url.searchParams.get('to_timestamp')),
   };
 
   try {

@@ -196,7 +196,8 @@
       "others": "Others",
       "dashboard": "Dashboard",
       "relayers": "Relayers",
-      "docs": "Docs"
+      "docs": "Docs",
+      "add_relayer": "Add"
     }
   }
 }
