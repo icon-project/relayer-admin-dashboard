@@ -33,11 +33,11 @@ const getVariant = (status: string): string => {
         case 'pending':
             return 'danger'
         case 'delivered':
-            return 'info'
+            return 'warning'
         case 'executed':
             return 'success'
         case 'rollbacked':
-            return 'warning'
+            return 'primary'
         default:
             return 'danger'
     }

@@ -9,7 +9,7 @@ interface LoadingProps {
 
 const Loading: FC<LoadingProps> = () => {
     return (
-        <div className="d-flex justify-content-center">
+        <div className="d-flex justify-content-center align-items-center">
             <Spinner animation="border" role="status" className="primary" style={{ width: '3rem', height: '3rem' }}>
                 <span className="visually-hidden">Loading...</span>
             </Spinner>
