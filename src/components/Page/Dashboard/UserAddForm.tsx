@@ -32,6 +32,20 @@ const UserAddForm: React.FC = () => {
 
     return (
         <Form onSubmit={handleSave}>
+            <Form.Group controlId="formName">
+                <Form.Label>Name</Form.Label>
+                <Form.Control
+                    type="text"
+                    value={user.name}
+                    className="mb-3"
+                    onChange={(e) =>
+                        setUser({
+                            ...user,
+                            name: e.target.value,
+                        })
+                    }
+                />
+            </Form.Group>
             <Form.Group controlId="formEmail">
                 <Form.Label>Email</Form.Label>
                 <Form.Control
@@ -91,12 +105,7 @@ const UserAddForm: React.FC = () => {
                 <Button
                     variant="primary"
                     type="submit"
-                    disabled={
-                        !user.email ||
-                        !user.password ||
-                        !user.company ||
-                        !user.designation
-                    }
+                    disabled={!user.email || !user.password || !user.company || !user.designation}
                 >
                     Save
                 </Button>

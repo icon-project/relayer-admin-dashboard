@@ -29,6 +29,19 @@ const UserEditForm: React.FC<UserEditFormProps> = ({ user }) => {
 
     return (
         <Form onSubmit={handleSave}>
+            <Form.Group controlId="formName">
+                <Form.Label>Name</Form.Label>
+                <Form.Control
+                    type="text"
+                    value={updatedUser.name}
+                    onChange={(e) =>
+                        setUpdatedUser({
+                            ...updatedUser,
+                            name: e.target.value,
+                        })
+                    }
+                />
+            </Form.Group>
             <Form.Group controlId="formEmail">
                 <Form.Label>Email</Form.Label>
                 <Form.Control

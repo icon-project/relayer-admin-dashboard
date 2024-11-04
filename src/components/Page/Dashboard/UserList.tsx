@@ -2,6 +2,7 @@
 
 import UserDeleteModal from '@/components/Page/Dashboard/UserDeleteModal'
 import { User } from '@/utils/user'
+import Link from 'next/link'
 import { useState } from 'react'
 import { Button, Col, Container, Row, Table } from 'react-bootstrap'
 
@@ -32,6 +33,7 @@ const UserList: React.FC<UsersListProps> = ({ users }) => {
                     <Table striped bordered hover className="mt-3" responsive>
                         <thead>
                             <tr>
+                                <th>Name</th>
                                 <th>Email</th>
                                 <th>Company</th>
                                 <th>Designation</th>
@@ -41,20 +43,17 @@ const UserList: React.FC<UsersListProps> = ({ users }) => {
                         <tbody>
                             {users.map((user) => (
                                 <tr key={user.id}>
+                                    <td>
+                                        <Link href={`/user/${user.id}`}>{user.name}</Link>
+                                    </td>
                                     <td>{user.email}</td>
                                     <td>{user.company}</td>
                                     <td>{user.designation}</td>
                                     <td>
-                                        <Button
-                                            variant="warning"
-                                            href={`/user/${user.id}/edit`}
-                                        >
+                                        <Button variant="warning" href={`/user/${user.id}/edit`} className="mr-2">
                                             Edit
                                         </Button>{' '}
-                                        <Button
-                                            variant="danger"
-                                            onClick={() => setCurrentUser(user)}
-                                        >
+                                        <Button variant="danger" onClick={() => setCurrentUser(user)} className="ml-2">
                                             Delete
                                         </Button>
                                     </td>
@@ -65,11 +64,7 @@ const UserList: React.FC<UsersListProps> = ({ users }) => {
                 </Col>
             </Row>
 
-            <UserDeleteModal
-                user={currentUser}
-                onDelete={handleDelete}
-                onCancel={() => setCurrentUser(null)}
-            />
+            <UserDeleteModal user={currentUser} onDelete={handleDelete} onCancel={() => setCurrentUser(null)} />
         </Container>
     )
 }
