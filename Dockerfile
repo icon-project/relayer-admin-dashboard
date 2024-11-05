@@ -26,8 +26,6 @@ COPY --from=prerelease /usr/src/app/.next/static .next/static
 COPY public /usr/src/app/public
 
 USER bun
-EXPOSE 3000/tcp
-
-VOLUME /usr/src/app/.next
+EXPOSE $PORT/tcp
 
 ENTRYPOINT [ "bun", "server.js" ]
