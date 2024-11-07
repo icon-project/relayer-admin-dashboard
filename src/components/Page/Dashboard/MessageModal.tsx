@@ -12,41 +12,45 @@ interface MessageModalProps {
 async function findMissedBy(message: Message): Promise<{ id: string; name: string; txHash: string; data: any } | null> {
     let response: Response
     let data: any
-    response = await fetch(`/api/relayer/find-event`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ txHash: message.src_tx_hash }),
-    })
-    if (!response.ok) {
-        return null
-    }
-    data = await response.json()
-    for (const event of data) {
-        if (!event.executed) {
-            data = { id: event.relayerId, name: event.name, txHash: event.txHash, data: event.data }
-            break
-        }
-    }
-    if (message.status === 'delivered') {
-        response = await fetch(`/api/relayer/find-event`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ txHash: message.dest_tx_hash }),
-        })
-        if (!response.ok) {
-            return null
-        }
-        data = await response.json()
-        for (const event of data) {
-            if (!event.executed) {
-                data = { id: event.relayerId, name: event.name, txHash: event.txHash, data: event.data }
-                break
+
+    switch (message.status) {
+        case 'pending':
+            response = await fetch(`/api/relayer/find-event`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ txHash: message.src_tx_hash }),
+            })
+            if (!response.ok) {
+                return null
             }
-        }
+            data = await response.json()
+            for (const event of data) {
+                if (!event.executed) {
+                    data = { id: event.relayerId, name: event.name, txHash: event.txHash, data: event.data }
+                    break
+                }
+            }
+            break
+        case 'delivered':
+            response = await fetch(`/api/relayer/find-event`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ txHash: message.dest_tx_hash }),
+            })
+            if (!response.ok) {
+                return null
+            }
+            data = await response.json()
+            for (const event of data) {
+                if (!event.executed) {
+                    data = { id: event.relayerId, name: event.name, txHash: event.txHash, data: event.data }
+                    break
+                }
+            }
     }
     return data
 }
@@ -66,7 +70,7 @@ const MessageModal: React.FC<MessageModalProps> = ({ show, handleClose, message 
             handleShowModal('No relayer found')
             return
         }
-        const response = await fetch(`/api/event?event=RelayMessage?relayerId=${missedBy.id}`, {
+        const response = await fetch(`/api/relayer?event=RelayMessage?relayerId=${missedBy.id}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
