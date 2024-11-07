@@ -70,7 +70,7 @@ const MessageModal: React.FC<MessageModalProps> = ({ show, handleClose, message 
             handleShowModal('No relayer found')
             return
         }
-        const response = await fetch(`/api/relayer?event=RelayMessage?relayerId=${missedBy.id}`, {
+        const response = await fetch(`/api/relayer?event=RelayMessage&relayerId=${missedBy.id}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
