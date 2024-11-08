@@ -67,7 +67,7 @@ const MessageModal: React.FC<MessageModalProps> = ({ show, handleClose, message 
     const handleExecute = async (message: Message) => {
         const missedBy = await findMissedBy(message)
         if (!missedBy) {
-            handleShowModal('No relayer found')
+            handleShowModal('No relayer found for this message to execute')
             return
         }
         const response = await fetch(`/api/relayer?event=RelayMessage&relayerId=${missedBy.id}`, {
@@ -78,10 +78,11 @@ const MessageModal: React.FC<MessageModalProps> = ({ show, handleClose, message 
             body: JSON.stringify({ txHash: missedBy.txHash, chain: missedBy.data.chainInfo.nid }),
         })
         if (!response.ok) {
-            return null
+            handleShowModal('Failed to execute the message')
+            return
         }
         const data = await response.json()
-        return data
+        handleShowModal(data.message)
     }
     useEffect(() => {
         const fetchMissedBy = async () => {
