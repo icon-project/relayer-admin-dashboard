@@ -1,5 +1,4 @@
 import NotificationModal from '@/components/Page/Dashboard/NotificationModal'
-import { MissedRelayer } from '@/utils/relayer'
 import { Message } from '@/utils/xcall-fetcher'
 import React, { useEffect, useState } from 'react'
 import { Button, Modal } from 'react-bootstrap'
@@ -10,7 +9,7 @@ interface MessageModalProps {
     message: Message
 }
 
-async function findMissedBy(message: Message): Promise<MissedRelayer | null> {
+async function findMissedBy(message: Message): Promise<{ id: string; name: string; txHash: string; data: any } | null> {
     let response: Response
     let data: any
 
@@ -57,7 +56,9 @@ async function findMissedBy(message: Message): Promise<MissedRelayer | null> {
 }
 
 const MessageModal: React.FC<MessageModalProps> = ({ show, handleClose, message }) => {
-    const [relayInfo, setRelayInfo] = React.useState<MissedRelayer | null>(null)
+    const [relayInfo, setRelayInfo] = React.useState<{ id: string; name: string; txHash: string; data: any } | null>(
+        null
+    )
     const [modalMessage, setModalMessage] = useState('')
     const [showNotification, setShowNotification] = useState(false)
     const handleCloseNotification = () => setShowNotification(false)
@@ -68,10 +69,10 @@ const MessageModal: React.FC<MessageModalProps> = ({ show, handleClose, message 
     const handleExecute = async (message: Message) => {
         const missedBy = await findMissedBy(message)
         if (!missedBy) {
-            handleShowModal('No relayer found for this message to execute')
+            handleShowModal('No relayer found for this message that can execute it')
             return
         }
-        const response = await fetch(`/api/relayer?event=RelayMessage&relayerId=${missedBy.relayerId}`, {
+        const response = await fetch(`/api/relayer?event=RelayMessage&relayerId=${missedBy.id}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

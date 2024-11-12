@@ -1,12 +1,14 @@
 'use client'
 
+import Loading from '@/components/Loading/Loading'
 import { useRelayer } from '@/hooks/use-relayer-list'
+import useDictionary from '@/locales/dictionary-hook'
 import { ChainBalanceResponse, ChainInfoResponse } from '@/utils/socket-fetch'
-import { faWallet } from '@fortawesome/free-solid-svg-icons'
+import { faEllipsisVertical, faWallet } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
-import { Card, Col, Row } from 'react-bootstrap'
+import { Card, Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Row } from 'react-bootstrap'
 
 const colors = ['primary', 'success', 'danger', 'warning', 'info']
 
@@ -15,6 +17,7 @@ const ChainsCard: React.FC = () => {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const { currentRelayer } = useRelayer()
+    const dict = useDictionary()
 
     useEffect(() => {
         const fetchChains = async () => {
@@ -73,7 +76,7 @@ const ChainsCard: React.FC = () => {
 
     return (
         <Row>
-            {loading && <p>Loading...</p>}
+            {loading && <Loading />}
             {error && <p className="text-danger">{error}</p>}
             {!loading &&
                 !error &&
@@ -96,6 +99,24 @@ const ChainsCard: React.FC = () => {
                                         </span>
                                     </div>
                                 </div>
+                                <Dropdown align="end">
+                                    <DropdownToggle
+                                        as="button"
+                                        bsPrefix="btn"
+                                        className="btn-link rounded-0 text-white shadow-none p-0"
+                                        id="dropdown-chart1"
+                                    >
+                                        <FontAwesomeIcon fixedWidth icon={faEllipsisVertical} />
+                                    </DropdownToggle>
+                                    <DropdownMenu>
+                                        <DropdownItem as={Link} href={`/chain/${chain.nid}/relay`}>
+                                            {dict.dashboard.action.relay}
+                                        </DropdownItem>
+                                        <DropdownItem as={Link} href={`/chain/${chain.nid}`}>
+                                            {dict.dashboard.xcall.actions.view}
+                                        </DropdownItem>
+                                    </DropdownMenu>
+                                </Dropdown>
                             </Card.Body>
                         </Card>
                     </Col>
