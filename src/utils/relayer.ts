@@ -9,7 +9,7 @@ const relayersPath = process.env.NEXT_RELAYERS_MAP_FILE_PATH || path.join(proces
 
 const tokenCache: { [relayerId: string]: CachedToken } = {};
 
-interface RelayerInfo {
+export interface RelayerInfo {
   id: string;
   name: string;
 }
@@ -232,7 +232,7 @@ export async function Proxy(request: ProxyRequest) {
   }
 }
 
-export async function getAvailableRelayers(): Promise<{ id: string, name: string }[]> {
+export async function getAvailableRelayers(): Promise<RelayerInfo[]> {
   const relayers = await readRelayers()
   return relayers.map((r: RelayerConfig) => ({ id: r.id, name: r.name }))
 }

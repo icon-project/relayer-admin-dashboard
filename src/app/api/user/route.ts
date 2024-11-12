@@ -1,4 +1,4 @@
-import { addUser, deleteUser, getUserById, readUsers, updateUser } from '@/utils/user';
+import { addUser, deleteUser, getUserById, readUsers, updateUser, User } from '@/utils/user';
 
 export async function GET(req: Request) {
   try {
@@ -18,7 +18,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const newUser = await req.json();
+    const newUser: User = await req.json();
     const addedUser = await addUser(newUser);
     return Response.json(addedUser, { status: 201 });
   } catch (e: any) {

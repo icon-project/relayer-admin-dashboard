@@ -1,31 +1,33 @@
 'use client'
 
+import { useRelayer } from '@/hooks/use-relayer-list'
 import { faCheck, faTowerCell } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle, NavLink } from 'react-bootstrap'
 
 interface HeaderRelayerProps {
-    currentRelayerId: string
     relayers: {
         id: string
         name: string
     }[]
 }
 
-export default function HeaderRelayer({ currentRelayerId, relayers }: HeaderRelayerProps) {
-    const [selectedRelayer, setRelayer] = useState(currentRelayerId)
+export default function HeaderRelayer({ relayers }: HeaderRelayerProps) {
+    const { currentRelayer, setCurrentRelayer } = useRelayer()
     const router = useRouter()
 
     const changeRelayer = (id: string) => {
-        if (id === selectedRelayer) {
+        const selectedRelayer = relayers.find((relayer) => relayer.id === id) || null
+
+        if (selectedRelayer?.id === currentRelayer?.id) {
             Cookies.remove('relayerId')
-            setRelayer('')
+            setCurrentRelayer(null)
+            router.refresh()
         } else {
             Cookies.set('relayerId', id)
-            setRelayer(id)
+            setCurrentRelayer(selectedRelayer)
         }
         router.refresh()
     }
@@ -46,9 +48,9 @@ export default function HeaderRelayer({ currentRelayerId, relayers }: HeaderRela
                         <DropdownItem
                             key={relayer.id}
                             onClick={() => changeRelayer(relayer.id)}
-                            active={relayer.id === selectedRelayer}
+                            active={relayer.id === currentRelayer?.id}
                         >
-                            {relayer.id === selectedRelayer && <FontAwesomeIcon icon={faCheck} />} {relayer.name}
+                            {relayer.id === currentRelayer?.id && <FontAwesomeIcon icon={faCheck} />} {relayer.name}
                         </DropdownItem>
                     ))}
                 </DropdownMenu>

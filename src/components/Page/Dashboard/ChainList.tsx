@@ -1,7 +1,8 @@
 'use client'
 
+import { useRelayer } from '@/hooks/use-relayer-list'
 import { ChainInfoResponse } from '@/utils/socket-fetch'
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import { Button, Col, Container, Row, Table } from 'react-bootstrap'
 
@@ -9,17 +10,21 @@ const ChainList: React.FC = () => {
     const [chains, setChains] = useState<ChainInfoResponse[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const { currentRelayer } = useRelayer()
     const router = useRouter()
 
     useEffect(() => {
         const fetchChains = async () => {
+            if (!currentRelayer) return
+
+            setLoading(true)
             try {
-                const response = await fetch(`/api/relayer?event=ListChainInfo`, {
+                const response = await fetch(`/api/route?event=ListChainInfo`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ chains: [] }),
+                    body: JSON.stringify({ relayerId: currentRelayer.id }),
                 })
 
                 if (!response.ok) {
@@ -36,7 +41,7 @@ const ChainList: React.FC = () => {
         }
 
         fetchChains()
-    }, [])
+    }, [currentRelayer])
 
     const handleShowDetails = (id: string) => {
         router.push(`/chain/${id}`)
@@ -56,6 +61,7 @@ const ChainList: React.FC = () => {
                                     <th>Name</th>
                                     <th>NID</th>
                                     <th>Type</th>
+                                    <th>Address</th>
                                     <th>Latest Height</th>
                                     <th>Last CheckPoint</th>
                                     <th>Actions</th>
@@ -67,6 +73,7 @@ const ChainList: React.FC = () => {
                                         <td>{chain.name}</td>
                                         <td>{chain.nid}</td>
                                         <td>{chain.type}</td>
+                                        <td>{chain.address}</td>
                                         <td>{chain.latestHeight}</td>
                                         <td>{chain.lastCheckPoint}</td>
                                         <td>

@@ -5,7 +5,7 @@ interface BreadcrumbProps {
     path: string
 }
 
-export default async function Breadcrumb({ path }: BreadcrumbProps) {
+export default function Breadcrumb({ path }: BreadcrumbProps) {
     const dict = useDictionary()
     const segments = path.split('/').filter(Boolean)
 

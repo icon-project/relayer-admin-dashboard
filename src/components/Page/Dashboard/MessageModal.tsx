@@ -82,7 +82,7 @@ const MessageModal: React.FC<MessageModalProps> = ({ show, handleClose, message 
             return
         }
         const data = await response.json()
-        handleShowModal(data.message)
+        handleShowModal('Message executed successfully')
     }
     useEffect(() => {
         const fetchMissedBy = async () => {
