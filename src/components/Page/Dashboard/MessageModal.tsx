@@ -1,4 +1,5 @@
 import NotificationModal from '@/components/Page/Dashboard/NotificationModal'
+import { MissedRelayer } from '@/utils/relayer'
 import { Message } from '@/utils/xcall-fetcher'
 import React, { useEffect, useState } from 'react'
 import { Button, Modal } from 'react-bootstrap'
@@ -9,7 +10,7 @@ interface MessageModalProps {
     message: Message
 }
 
-async function findMissedBy(message: Message): Promise<{ id: string; name: string; txHash: string; data: any } | null> {
+async function findMissedBy(message: Message): Promise<MissedRelayer | null> {
     let response: Response
     let data: any
 
@@ -56,7 +57,7 @@ async function findMissedBy(message: Message): Promise<{ id: string; name: strin
 }
 
 const MessageModal: React.FC<MessageModalProps> = ({ show, handleClose, message }) => {
-    const [relayInfo, setRelayInfo] = React.useState<{ id: string; name: string } | null>(null)
+    const [relayInfo, setRelayInfo] = React.useState<MissedRelayer | null>(null)
     const [modalMessage, setModalMessage] = useState('')
     const [showNotification, setShowNotification] = useState(false)
     const handleCloseNotification = () => setShowNotification(false)

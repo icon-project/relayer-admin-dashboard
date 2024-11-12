@@ -241,11 +241,12 @@ export function getCurrentRelayer(): string {
   return cookies().get('relayerId')?.value ?? ''
 }
 
-interface MissedRelayer {
+export interface MissedRelayer {
   relayerId: string;
   name: string;
   txHash: string;
   data: BlockEvents;
+  executed: boolean;
 }
 
 export async function getEventMissedRelayer(txHash: string): Promise<MissedRelayer[] | null> {
@@ -257,7 +258,7 @@ export async function getEventMissedRelayer(txHash: string): Promise<MissedRelay
         return null;
       }
       for (const event of events) {
-        return { relayerId: 'self', name: "Self", txHash: txHash, data: event };
+        return { relayerId: 'self', name: "Self", txHash: txHash, data: event, executed: event.executed };
       }
       return null;
     } catch (error) {
@@ -279,7 +280,7 @@ export async function getEventMissedRelayer(txHash: string): Promise<MissedRelay
         return null;
       }
       for (const event of events) {
-        return { relayerId: relayer.id, name: relayer.name, txHash: event.txHash, data: event };
+        return { relayerId: relayer.id, name: relayer.name, txHash: event.txHash, data: event, executed: event.executed };
       }
     } catch (error) {
       console.error(`Error fetching block events from relayer ${relayer.id}:`, error);
