@@ -4,12 +4,10 @@ import { useRelayer } from '@/hooks/relayer/use-relayer-list'
 import { faCheck, faTowerCell } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Cookies from 'js-cookie'
-import { useRouter } from 'next/navigation'
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle, NavLink } from 'react-bootstrap'
 
 export default function HeaderRelayer() {
     const { relayers, currentRelayer, setCurrentRelayer } = useRelayer()
-    const router = useRouter()
 
     const changeRelayer = (id: string) => {
         const selectedRelayer = relayers.find((relayer) => relayer.id === id) || null
