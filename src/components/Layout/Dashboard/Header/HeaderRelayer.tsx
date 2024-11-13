@@ -7,15 +7,8 @@ import Cookies from 'js-cookie'
 import { useRouter } from 'next/navigation'
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle, NavLink } from 'react-bootstrap'
 
-interface HeaderRelayerProps {
-    relayers: {
-        id: string
-        name: string
-    }[]
-}
-
-export default function HeaderRelayer({ relayers }: HeaderRelayerProps) {
-    const { currentRelayer, setCurrentRelayer } = useRelayer()
+export default function HeaderRelayer() {
+    const { relayers, currentRelayer, setCurrentRelayer } = useRelayer()
     const router = useRouter()
 
     const changeRelayer = (id: string) => {
@@ -24,12 +17,10 @@ export default function HeaderRelayer({ relayers }: HeaderRelayerProps) {
         if (selectedRelayer?.id === currentRelayer?.id) {
             Cookies.remove('relayerId')
             setCurrentRelayer(null)
-            router.refresh()
         } else {
             Cookies.set('relayerId', id)
             setCurrentRelayer(selectedRelayer)
         }
-        router.refresh()
     }
 
     return (
