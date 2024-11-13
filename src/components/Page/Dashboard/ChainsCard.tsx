@@ -1,7 +1,7 @@
 'use client'
 
 import Loading from '@/components/Loading/Loading'
-import { useRelayer } from '@/hooks/use-relayer-list'
+import { useRelayer } from '@/hooks/relayer/use-relayer-list'
 import useDictionary from '@/locales/dictionary-hook'
 import { ChainBalanceResponse, ChainInfoResponse } from '@/utils/socket-fetch'
 import { faEllipsisVertical, faWallet } from '@fortawesome/free-solid-svg-icons'

@@ -1,7 +1,8 @@
 'use client'
 
 import { RelayerInfo } from '@/utils/relayer'
-import { createContext, ReactNode, useContext, useState } from 'react'
+import Cookies from 'js-cookie'
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
 
 interface RelayerContextProps {
     relayers: RelayerInfo[]
@@ -13,6 +14,14 @@ const RelayerContext = createContext<RelayerContextProps | undefined>(undefined)
 
 export const RelayerProvider = ({ relayers, children }: { relayers: RelayerInfo[]; children: ReactNode }) => {
     const [currentRelayer, setCurrentRelayer] = useState<RelayerInfo | null>(null)
+
+    useEffect(() => {
+        const savedRelayerId = Cookies.get('relayerId')
+        if (savedRelayerId) {
+            const savedRelayer = relayers.find((relayer) => relayer.id === savedRelayerId) || null
+            setCurrentRelayer(savedRelayer)
+        }
+    }, [relayers])
 
     return (
         <RelayerContext.Provider value={{ relayers, currentRelayer, setCurrentRelayer }}>

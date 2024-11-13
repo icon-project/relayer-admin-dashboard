@@ -1,6 +1,6 @@
 'use client'
 
-import { useRelayer } from '@/hooks/use-relayer-list'
+import { useRelayer } from '@/hooks/relayer/use-relayer-list'
 import { faCheck, faTowerCell } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Cookies from 'js-cookie'

@@ -2,7 +2,7 @@ import '@/styles/globals.scss'
 // Next.js allows you to import CSS directly in .js files.
 // It handles optimization and all the necessary Webpack configuration to make this work.
 import ProgressBar from '@/components/ProgressBar/ProgressBar'
-import { RelayerProvider } from '@/hooks/use-relayer-list'
+import { RelayerProvider } from '@/hooks/relayer/use-relayer-list'
 import { defaultLocale } from '@/locales/config'
 import { getDictionary } from '@/locales/dictionary'
 import DictionaryProvider from '@/locales/DictionaryProvider'

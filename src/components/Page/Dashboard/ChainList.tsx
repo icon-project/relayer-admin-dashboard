@@ -1,6 +1,6 @@
 'use client'
 
-import { useRelayer } from '@/hooks/use-relayer-list'
+import { useRelayer } from '@/hooks/relayer/use-relayer-list'
 import { ChainInfoResponse } from '@/utils/socket-fetch'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
