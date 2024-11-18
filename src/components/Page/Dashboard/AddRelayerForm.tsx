@@ -36,6 +36,7 @@ const AddRelayerForm: React.FC = () => {
                     type="text"
                     value={relayer.name}
                     className="mb-3"
+                    required
                     onChange={(e) =>
                         setRelayer({
                             ...relayer,
@@ -50,6 +51,7 @@ const AddRelayerForm: React.FC = () => {
                     type="text"
                     value={relayer.host}
                     className="mb-3"
+                    required
                     onChange={(e) =>
                         setRelayer({
                             ...relayer,
@@ -64,6 +66,7 @@ const AddRelayerForm: React.FC = () => {
                     type="email"
                     value={relayer.auth.email}
                     className="mb-3"
+                    required
                     onChange={(e) =>
                         setRelayer({
                             ...relayer,
@@ -97,12 +100,7 @@ const AddRelayerForm: React.FC = () => {
                     variant="primary"
                     type="submit"
                     className="px-4 py-2 mt-3"
-                    disabled={
-                        !relayer.name ||
-                        !relayer.host ||
-                        !relayer.auth.email ||
-                        !relayer.auth.password
-                    }
+                    disabled={!relayer.name || !relayer.host || !relayer.auth.email || !relayer.auth.password}
                 >
                     Save
                 </Button>

@@ -2,7 +2,7 @@
 
 import { useRelayer } from '@/hooks/relayer/use-relayer-list'
 import { ChainInfoResponse } from '@/utils/socket-fetch'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { Button, Col, Container, Row, Table } from 'react-bootstrap'
 
@@ -19,7 +19,7 @@ const ChainList: React.FC = () => {
 
             setLoading(true)
             try {
-                const response = await fetch(`/api/route?event=ListChainInfo`, {
+                const response = await fetch(`/api/relayer?event=ListChainInfo`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
