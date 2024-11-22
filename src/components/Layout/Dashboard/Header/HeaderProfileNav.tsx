@@ -69,36 +69,26 @@ export default async function HeaderProfileNav() {
                     </div>
                 </DropdownToggle>
                 <DropdownMenu className="pt-0">
-                    <DropdownHeader className="fw-bold rounded-top">
-                        {dict.profile.account.title}
-                    </DropdownHeader>
+                    <DropdownHeader className="fw-bold rounded-top">{dict.profile.account.title}</DropdownHeader>
 
-                    <DropdownHeader className="fw-bold">
-                        {dict.profile.settings.title}
-                    </DropdownHeader>
+                    <DropdownHeader className="fw-bold">{dict.profile.settings.title}</DropdownHeader>
 
                     <Link href="/relayer" passHref legacyBehavior>
                         <DropdownItem>
-                            <ItemWithIcon icon={faTowerCell}>
-                                {dict.profile.settings.items.relayers}
-                            </ItemWithIcon>
+                            <ItemWithIcon icon={faTowerCell}>{dict.profile.settings.items.relayers}</ItemWithIcon>
                         </DropdownItem>
                     </Link>
 
                     <Link href="/user" passHref legacyBehavior>
                         <DropdownItem>
-                            <ItemWithIcon icon={faUser}>
-                                {dict.profile.settings.items.users}
-                            </ItemWithIcon>
+                            <ItemWithIcon icon={faUser}>{dict.profile.settings.items.users}</ItemWithIcon>
                         </DropdownItem>
                     </Link>
 
                     <DropdownDivider />
                     <HeaderLogout>
                         <DropdownItem>
-                            <ItemWithIcon icon={faPowerOff}>
-                                {dict.profile.logout}
-                            </ItemWithIcon>
+                            <ItemWithIcon icon={faPowerOff}>{dict.profile.logout}</ItemWithIcon>
                         </DropdownItem>
                     </HeaderLogout>
                 </DropdownMenu>
