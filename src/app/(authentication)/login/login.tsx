@@ -21,9 +21,8 @@ export default function Login({ callbackUrl }: { callbackUrl: string }) {
     const login = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         setSubmitting(true)
-        const formData = new FormData(e.currentTarget)
-
         try {
+            const formData = new FormData(e.currentTarget)
             const res = await signIn('credentials', {
                 email: formData.get('email'),
                 password: formData.get('password'),
@@ -47,10 +46,8 @@ export default function Login({ callbackUrl }: { callbackUrl: string }) {
                 setError('Login failed')
                 return
             }
-            await new Promise((resolve) => setTimeout(resolve, 2000)) // Simulate a delay
-            if (url) {
-                router.push(url)
-            }
+            await new Promise((resolve) => setTimeout(resolve, 1000))
+            router.push(url || '/')
         } catch (err) {
             if (err instanceof Error) {
                 setError(err.message)
