@@ -52,7 +52,7 @@ export default function Login({ callbackUrl }: { callbackUrl: string }) {
                 setError('Login failed')
                 return
             }
-            router.push(url || '/')
+            window.location.href = url ?? callbackUrl
         } catch (err) {
             if (err instanceof Error) {
                 setError(err.message)
