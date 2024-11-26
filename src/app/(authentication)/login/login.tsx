@@ -18,13 +18,12 @@ export default function Login({ callbackUrl }: { callbackUrl: string }) {
     const router = useRouter()
     const dict = useDictionary()
 
-    const login = async (e: React.FormEvent<HTMLFormElement>) => {
+    const login = async (formData: FormData) => {
         setSubmitting(true)
         setError('')
         try {
-            const formData = new FormData(e.currentTarget)
             const res = await signIn('credentials', {
-                email: formData.get('email'),
+                username: formData.get('username'),
                 password: formData.get('password'),
                 redirect: false,
                 callbackUrl,
