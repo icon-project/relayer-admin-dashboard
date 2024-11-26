@@ -62,7 +62,7 @@ export default function Login({ callbackUrl }: { callbackUrl: string }) {
             <Alert variant="danger" show={error !== ''} onClose={() => setError('')} dismissible>
                 {error}
             </Alert>
-            <Form onSubmit={login}>
+            <Form action={login}>
                 <InputGroup className="mb-3">
                     <InputGroupText>
                         <FontAwesomeIcon icon={faUser} fixedWidth />
