@@ -2,7 +2,7 @@ import 'server-only';
 
 import os from 'os';
 
-interface MemoryMetrics {
+export interface MemoryMetrics {
   totalMemory: number;
   usedMemory: number;
   freeMemory: number;
@@ -10,12 +10,12 @@ interface MemoryMetrics {
   freeMemoryPercentage: number;
 }
 
-interface NetworkMetrics {
+export interface NetworkMetrics {
   uploadSpeed: string;
   downloadSpeed: string;
 }
 
-interface SystemMetrics {
+export interface SystemMetrics {
   cpuUsage: number;
   memory: MemoryMetrics;
   networkMetrics: NetworkMetrics;
@@ -60,5 +60,3 @@ export default async function fetchMetrics(): Promise<SystemMetrics> {
     timestamp,
   };
 }
-
-export type { MemoryMetrics, NetworkMetrics, SystemMetrics };
