@@ -59,7 +59,7 @@ async function findMissedBy(
 }
 
 const MessageModal: React.FC<MessageModalProps> = ({ show, handleClose, message }) => {
-    const [relayInfo, setRelayInfo] = React.useState<{ id: string; name: string; txHash: string; data: any } | null>(
+    const [relayInfo, setRelayInfo] = React.useState<{ id: string; name: string; txHash: string; data: any }[] | null>(
         null
     )
     const [modalMessage, setModalMessage] = useState('')
@@ -135,7 +135,8 @@ const MessageModal: React.FC<MessageModalProps> = ({ show, handleClose, message 
                     </p>
                     {relayInfo && (
                         <p>
-                            <strong>Missed By:</strong> {relayInfo ? relayInfo.name : 'Loading...'}
+                            <strong>Missed By:</strong>{' '}
+                            {relayInfo ? relayInfo.map((info) => info.name).join(', ') : 'Loading...'}
                         </p>
                     )}
                 </Modal.Body>
