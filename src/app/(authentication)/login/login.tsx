@@ -5,10 +5,10 @@ import useDictionary from '@/locales/dictionary-hook'
 import { faUser } from '@fortawesome/free-regular-svg-icons'
 import { faLock } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { signIn } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Alert, Button, Col, Form, FormControl, InputGroup, Row } from 'react-bootstrap'
 import InputGroupText from 'react-bootstrap/InputGroupText'
 
@@ -17,6 +17,13 @@ export default function Login({ callbackUrl }: { callbackUrl: string }) {
     const [error, setError] = useState('')
     const router = useRouter()
     const dict = useDictionary()
+    const { data: session, status } = useSession()
+
+    useEffect(() => {
+        if (status === 'authenticated') {
+            router.push(callbackUrl)
+        }
+    }, [status, callbackUrl, router])
 
     const login = async (formData: FormData) => {
         setSubmitting(true)
