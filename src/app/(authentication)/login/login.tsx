@@ -23,7 +23,7 @@ export default function Login({ callbackUrl }: { callbackUrl: string }) {
         setError('')
         try {
             const res = await signIn('credentials', {
-                username: formData.get('email'),
+                email: formData.get('email'),
                 password: formData.get('password'),
                 redirect: false,
                 callbackUrl,
