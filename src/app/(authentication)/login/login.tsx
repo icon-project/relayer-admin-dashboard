@@ -52,7 +52,6 @@ export default function Login({ callbackUrl }: { callbackUrl: string }) {
                 setError('Login failed')
                 return
             }
-            await new Promise((resolve) => setTimeout(resolve, 1000))
             router.push(url || '/')
         } catch (err) {
             if (err instanceof Error) {
