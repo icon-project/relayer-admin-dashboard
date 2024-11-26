@@ -19,7 +19,6 @@ export default function Login({ callbackUrl }: { callbackUrl: string }) {
     const dict = useDictionary()
 
     const login = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
         setSubmitting(true)
         setError('')
         try {
@@ -48,7 +47,7 @@ export default function Login({ callbackUrl }: { callbackUrl: string }) {
                 return
             }
             await new Promise((resolve) => setTimeout(resolve, 1000))
-            router.refresh()
+            router.push(url || '/')
         } catch (err) {
             if (err instanceof Error) {
                 setError(err.message)
