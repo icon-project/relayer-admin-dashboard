@@ -9,9 +9,12 @@ interface MessageModalProps {
     message: Message
 }
 
-async function findMissedBy(message: Message): Promise<{ id: string; name: string; txHash: string; data: any } | null> {
+async function findMissedBy(
+    message: Message
+): Promise<{ id: string; name: string; txHash: string; data: any }[] | null> {
     let response: Response
     let data: any
+    let result: { id: string; name: string; txHash: string; data: any }[] = []
 
     switch (message.status) {
         case 'pending':
@@ -28,8 +31,8 @@ async function findMissedBy(message: Message): Promise<{ id: string; name: strin
             data = await response.json()
             for (const event of data) {
                 if (!event.executed) {
-                    data = { id: event.relayerId, name: event.name, txHash: event.txHash, data: event.data }
-                    break
+                    const res = { id: event.relayerId, name: event.name, txHash: event.txHash, data: event.data }
+                    result.push(res)
                 }
             }
             break
@@ -47,8 +50,8 @@ async function findMissedBy(message: Message): Promise<{ id: string; name: strin
             data = await response.json()
             for (const event of data) {
                 if (!event.executed) {
-                    data = { id: event.relayerId, name: event.name, txHash: event.txHash, data: event.data }
-                    break
+                    const res = { id: event.relayerId, name: event.name, txHash: event.txHash, data: event.data }
+                    result.push(res)
                 }
             }
     }
@@ -67,23 +70,25 @@ const MessageModal: React.FC<MessageModalProps> = ({ show, handleClose, message 
         setShowNotification(true)
     }
     const handleExecute = async (message: Message) => {
-        const missedBy = await findMissedBy(message)
-        if (!missedBy) {
+        const missedMessages = await findMissedBy(message)
+        if (!missedMessages) {
             handleShowModal('No relayer found for this message that can execute it')
             return
         }
-        const response = await fetch(`/api/relayer?event=RelayMessage&relayerId=${missedBy.id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ txHash: missedBy.txHash, chain: missedBy.data.chainInfo.nid }),
-        })
-        if (!response.ok) {
-            handleShowModal('Failed to execute the message')
-            return
+        for (const relayer of missedMessages) {
+            const response = await fetch(`/api/relayer?event=RelayMessage&relayerId=${relayer.id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ txHash: relayer.txHash, chain: relayer.data.chainInfo.nid }),
+            })
+            if (!response.ok) {
+                handleShowModal('Failed to execute the message')
+                return
+            }
+            const data = await response.json()
         }
-        const data = await response.json()
         handleShowModal('Message executed successfully')
     }
     useEffect(() => {

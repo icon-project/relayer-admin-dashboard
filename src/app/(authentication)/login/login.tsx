@@ -63,7 +63,7 @@ export default function Login({ callbackUrl }: { callbackUrl: string }) {
     }
 
     return (
-        <div>
+        <>
             {submitting && <Loading />}
             <Alert variant="danger" show={error !== ''} onClose={() => setError('')} dismissible>
                 {error}
@@ -110,6 +110,6 @@ export default function Login({ callbackUrl }: { callbackUrl: string }) {
                     </Col>
                 </Row>
             </Form>
-        </div>
+        </>
     )
 }
