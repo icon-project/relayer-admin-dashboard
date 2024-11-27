@@ -42,7 +42,7 @@ const MessageModal: React.FC<MessageModalProps> = ({ show, handleClose, message 
         const success = await executeRelay(missedRelayers)
         setLoading(false)
         if (success) {
-            handleShowModal('Message executed successfully')
+            handleShowModal('Transaction is in the queue for execution')
         } else {
             handleShowModal('Failed to execute the message')
         }
