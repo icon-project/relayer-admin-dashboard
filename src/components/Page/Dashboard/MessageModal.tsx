@@ -1,4 +1,6 @@
+import Loading from '@/components/Loading/Loading'
 import NotificationModal from '@/components/Page/Dashboard/NotificationModal'
+import { executeRelay, findMissedBy } from '@/utils/relay-action'
 import { MissedRelayer } from '@/utils/relayer'
 import { Message } from '@/utils/xcall-fetcher'
 import React, { useEffect, useState } from 'react'
@@ -10,102 +12,65 @@ interface MessageModalProps {
     message: Message
 }
 
-async function findMissedBy(
-    message: Message
-): Promise<{ id: string; name: string; txHash: string; data: any }[] | null> {
-    let response: Response
-    let data: MissedRelayer[]
-    let result: { id: string; name: string; txHash: string; data: any }[] = []
-
-    switch (message.status) {
-        case 'pending':
-            response = await fetch(`/api/relayer/find-event`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ txHash: message.src_tx_hash }),
-            })
-            if (!response.ok) {
-                return null
-            }
-            data = await response.json()
-            for (const event of data) {
-                if (!event.executed) {
-                    const res = { id: event.relayerId, name: event.name, txHash: event.txHash, data: event.data }
-                    result.push(res)
-                }
-            }
-            break
-        case 'delivered':
-            response = await fetch(`/api/relayer/find-event`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ txHash: message.dest_tx_hash }),
-            })
-            if (!response.ok) {
-                return null
-            }
-            data = await response.json()
-            for (const event of data) {
-                if (!event.executed) {
-                    const res = { id: event.relayerId, name: event.name, txHash: event.txHash, data: event.data }
-                    result.push(res)
-                }
-            }
-    }
-    return result
-}
-
 const MessageModal: React.FC<MessageModalProps> = ({ show, handleClose, message }) => {
-    const [relayInfo, setRelayInfo] = React.useState<{ id: string; name: string; txHash: string; data: any }[] | null>(
-        null
-    )
+    const [relayInfo, setRelayInfo] = useState<MissedRelayer[] | null>(null)
     const [modalMessage, setModalMessage] = useState('')
     const [showNotification, setShowNotification] = useState(false)
+    const [loading, setLoading] = useState(false)
+
     const handleCloseNotification = () => setShowNotification(false)
     const handleShowModal = (message: string) => {
         setModalMessage(message)
         setShowNotification(true)
     }
+
     const handleExecute = async (message: Message) => {
-        const missedMessages = await findMissedBy(message)
-        if (!missedMessages) {
-            handleShowModal('No relayer found for this message that can execute it')
+        setLoading(true)
+        const hash = message.status === 'pending' ? message.src_tx_hash : message.dest_tx_hash
+        if (!hash) {
+            handleShowModal('Transaction hash not found')
+            setLoading(false)
             return
         }
-        for (const relayer of missedMessages) {
-            const response = await fetch(`/api/relayer?event=RelayMessage&relayerId=${relayer.id}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ txHash: relayer.txHash, chain: relayer.data.chainInfo.nid }),
-            })
-            if (!response.ok) {
-                handleShowModal('Failed to execute the message')
-                return
-            }
-            const data = await response.json()
+        const missedRelayers = await findMissedBy(hash)
+        if (!missedRelayers || missedRelayers.length === 0) {
+            handleShowModal('No relayer found for this message that can execute it')
+            setLoading(false)
+            return
         }
-        handleShowModal('Message executed successfully')
+
+        const success = await executeRelay(missedRelayers)
+        setLoading(false)
+        if (success) {
+            handleShowModal('Message executed successfully')
+        } else {
+            handleShowModal('Failed to execute the message')
+        }
     }
+
     useEffect(() => {
         const fetchMissedBy = async () => {
+            setLoading(true)
             try {
-                const result = await findMissedBy(message)
+                const hash = message.status === 'pending' ? message.src_tx_hash : message.dest_tx_hash
+                if (!hash) {
+                    setLoading(false)
+                    return
+                }
+                const result = await findMissedBy(hash)
                 setRelayInfo(result)
             } catch (error) {
                 console.error('Error fetching missed by information:', error)
+            } finally {
+                setLoading(false)
             }
         }
 
         if (show) {
             fetchMissedBy()
         }
-    }, [show])
+    }, [show, message.src_tx_hash, message.dest_tx_hash])
+
     return (
         <div>
             <Modal show={show} onHide={handleClose} role="dialog" size="lg" centered>
@@ -113,39 +78,44 @@ const MessageModal: React.FC<MessageModalProps> = ({ show, handleClose, message 
                     <Modal.Title>Message Details</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <p>
-                        <strong>ID:</strong> {message.id}
-                    </p>
-                    <p>
-                        <strong>Source Block Number:</strong> {message.src_block_number}
-                    </p>
-                    <p>
-                        <strong>Source Network:</strong> {message.src_network}
-                    </p>
-                    <p>
-                        <strong>Destination Network:</strong> {message.dest_network}
-                    </p>
-                    <p>
-                        <strong>Status:</strong> {message.status}
-                    </p>
-                    <p>
-                        <strong>Created At:</strong> {message.created_at}
-                    </p>
-                    <p>
-                        <strong>Source Address:</strong> {message.src_address}
-                    </p>
-                    {relayInfo && (
-                        <p>
-                            <strong>Missed By:</strong>{' '}
-                            {relayInfo ? relayInfo.map((info) => info.name).join(', ') : 'Loading...'}
-                        </p>
+                    {loading ? (
+                        <Loading />
+                    ) : (
+                        <>
+                            <p>
+                                <strong>ID:</strong> {message.id}
+                            </p>
+                            <p>
+                                <strong>Source Block Number:</strong> {message.src_block_number}
+                            </p>
+                            <p>
+                                <strong>Source Network:</strong> {message.src_network}
+                            </p>
+                            <p>
+                                <strong>Destination Network:</strong> {message.dest_network}
+                            </p>
+                            <p>
+                                <strong>Status:</strong> {message.status}
+                            </p>
+                            <p>
+                                <strong>Created At:</strong> {message.created_at}
+                            </p>
+                            <p>
+                                <strong>Source Address:</strong> {message.src_address}
+                            </p>
+                            {relayInfo && (
+                                <p>
+                                    <strong>Missed By:</strong> {relayInfo.map((info) => info.name).join(', ')}
+                                </p>
+                            )}
+                        </>
                     )}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>
                         Close
                     </Button>
-                    <Button variant="danger" onClick={() => handleExecute(message)}>
+                    <Button variant="danger" onClick={() => handleExecute(message)} disabled={loading}>
                         Execute
                     </Button>
                 </Modal.Footer>

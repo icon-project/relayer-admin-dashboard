@@ -1,8 +1,8 @@
 'use client'
 
+import { executeRelay, findMissedBy } from '@/utils/relay-action'
 import React, { useState } from 'react'
-import { Button, Col, Container, Form, Row } from 'react-bootstrap'
-import NotificationModal from './NotificationModal'
+import { Alert, Button, Card, Col, Container, Form, FormControl, InputGroup, Row } from 'react-bootstrap'
 
 interface ManualRelayFormProps {
     chainId: string
@@ -21,82 +21,50 @@ const ManualRelayForm: React.FC<ManualRelayFormProps> = ({ chainId }) => {
 
     const handleRelay = async (event: React.FormEvent) => {
         event.preventDefault()
+        const missedRelayers = await findMissedBy(txHash)
+        if (!missedRelayers || missedRelayers.length === 0) {
+            handleShowNotification('No relayer found for this transaction hash that can execute it')
+            return
+        }
 
-        try {
-            // Fetch relayer ID and execution status
-            const response = await fetch(`/api/relayer/find-event`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ txHash }),
-            })
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch relayer ID and execution status')
-            }
-
-            const data = await response.json()
-            const missedBy = data.find((event: any) => !event.executed)
-
-            if (!missedBy) {
-                handleShowNotification('No relayer found or all messages have been executed')
-                return
-            }
-
-            const { relayerId, executed } = missedBy
-
-            if (!executed) {
-                const relayResponse = await fetch(`/api/event?event=RelayMessage&relayerId=${relayerId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ txHash, chain: chainId }),
-                })
-
-                if (!relayResponse.ok) {
-                    throw new Error('Failed to relay message')
-                }
-                handleShowNotification('Message relayed successfully')
-            }
-            setTxHash('')
-        } catch (error) {
-            console.error('Error:', error)
-            handleShowNotification('An error occurred during the relay process')
+        const success = await executeRelay(missedRelayers)
+        if (success) {
+            handleShowNotification('Transaction executed successfully')
+        } else {
+            handleShowNotification('Failed to execute the transaction')
         }
     }
 
     return (
-        <Container>
-            <Row className="justify-content-md-center">
-                <Col md="6">
-                    <h1>Relay Message</h1>
-                    <Form onSubmit={handleRelay}>
-                        <Form.Group controlId="txHash">
-                            <Form.Label>Transaction Hash</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={txHash}
-                                onChange={(e) => setTxHash(e.target.value)}
-                                placeholder="Enter transaction hash"
-                                required
-                            />
-                        </Form.Group>
-                        <div className="d-flex justify-content-end mt-3">
-                            <Button variant="primary" type="submit" className="px-4" disabled={!txHash}>
-                                Relay
-                            </Button>
-                        </div>
-                    </Form>
+        <Container className="mt-5">
+            <Row className="justify-content-center">
+                <Col md={8}>
+                    <Card>
+                        <Card.Header className="bg-primary text-white">
+                            <h4>Manual Relay</h4>
+                        </Card.Header>
+                        <Card.Body>
+                            <Form onSubmit={handleRelay}>
+                                <InputGroup className="mb-3">
+                                    <FormControl
+                                        placeholder="Transaction Hash"
+                                        aria-label="Transaction Hash"
+                                        aria-describedby="basic-addon2"
+                                        value={txHash}
+                                        onChange={(e) => setTxHash(e.target.value)}
+                                    />
+                                    <Button variant="primary" type="submit" disabled={txHash === ''}>
+                                        Relay
+                                    </Button>
+                                </InputGroup>
+                            </Form>
+                            <Alert variant="info" show={showNotification} onClose={handleCloseNotification} dismissible>
+                                {notificationMessage}
+                            </Alert>
+                        </Card.Body>
+                    </Card>
                 </Col>
             </Row>
-            <NotificationModal
-                show={showNotification}
-                handleClose={handleCloseNotification}
-                title="Notification"
-                message={notificationMessage}
-            />
         </Container>
     )
 }

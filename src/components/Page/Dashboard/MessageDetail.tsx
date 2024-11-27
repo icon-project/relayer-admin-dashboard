@@ -4,9 +4,10 @@ import { MessageByIdResponse } from '@/utils/xcall-fetcher'
 import { faClipboard } from '@fortawesome/free-regular-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import moment from 'moment'
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import { Button, Card, CardBody, CardHeader, Table } from 'react-bootstrap'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
+import MessageModal from './MessageModal'
 
 type Props = {
     message: MessageByIdResponse
@@ -14,6 +15,11 @@ type Props = {
 
 const MessageDetail: FC<Props> = ({ message }) => {
     const data = message.data[0]
+
+    const [showModal, setShowModal] = useState(false)
+
+    const handleCloseModal = () => setShowModal(false)
+    const handleShowModal = () => setShowModal(true)
 
     const formatDate = (date: string) => {
         const timeStamp = parseInt(date) * 1000
@@ -42,8 +48,15 @@ const MessageDetail: FC<Props> = ({ message }) => {
     return (
         <div className="flex justify-center">
             <Card className="mb-4">
-                <CardHeader className="bg-primary text-white">
-                    {data.src_network} -{'>'} {data.dest_network}
+                <CardHeader className="bg-primary text-white d-flex justify-content-between align-items-center">
+                    <span>
+                        {data.src_network} -{'>'} {data.dest_network}
+                    </span>
+                    {(data.status === 'pending' || data.status === 'delivered') && (
+                        <Button variant="light" onClick={handleShowModal}>
+                            Relay Message
+                        </Button>
+                    )}
                 </CardHeader>
                 <CardBody>
                     <Table striped bordered hover>
@@ -189,6 +202,7 @@ const MessageDetail: FC<Props> = ({ message }) => {
                     </Table>
                 </CardBody>
             </Card>
+            <MessageModal show={showModal} handleClose={handleCloseModal} message={data} />
         </div>
     )
 }

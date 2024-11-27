@@ -1,5 +1,6 @@
 'use client'
 
+import Loading from '@/components/Loading/Loading'
 import { useRelayer } from '@/hooks/relayer/use-relayer-list'
 import { ChainInfoResponse } from '@/utils/socket-fetch'
 import { useRouter } from 'next/navigation'
@@ -15,16 +16,15 @@ const ChainList: React.FC = () => {
 
     useEffect(() => {
         const fetchChains = async () => {
-            if (!currentRelayer) return
-
             setLoading(true)
+            const relayerId = currentRelayer?.id ?? ''
             try {
                 const response = await fetch(`/api/relayer?event=ListChainInfo`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ relayerId: currentRelayer.id }),
+                    body: JSON.stringify({ relayerId }),
                 })
 
                 if (!response.ok) {
@@ -52,7 +52,7 @@ const ChainList: React.FC = () => {
             <Row className="justify-content-md-center">
                 <Col md="10">
                     <h1>Chain List</h1>
-                    {loading && <p>Loading...</p>}
+                    {loading && <Loading />}
                     {error && <p className="text-danger">{error}</p>}
                     {!loading && !error && (
                         <Table striped bordered hover>
