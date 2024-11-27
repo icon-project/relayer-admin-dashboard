@@ -46,7 +46,7 @@ const ChainDetails: React.FC<ChainDetailsProps> = ({ id }) => {
                             Manual Relay
                         </Button>
                     </Link>
-                    <Link href="/chains" passHref>
+                    <Link href="/chain" passHref>
                         <Button variant="secondary" size="sm">
                             View Chain List
                         </Button>
