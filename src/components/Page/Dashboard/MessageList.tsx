@@ -96,7 +96,7 @@ const MessageList: React.FC = () => {
                                     <th>SN</th>
                                     <th>Event Type</th>
                                     <th>Height</th>
-                                    <th>Last Try</th>
+                                    <th>Last/Next Try</th>
                                     <th>Retry Count</th>
                                     <th>Actions</th>
                                 </tr>

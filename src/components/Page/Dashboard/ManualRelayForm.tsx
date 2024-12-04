@@ -2,6 +2,7 @@
 
 import Loading from '@/components/Loading/Loading'
 import { executeRelay, findMissedBy } from '@/utils/relay-action'
+import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 import { Alert, Button, Card, Col, Container, Form, FormControl, InputGroup, Row } from 'react-bootstrap'
 
@@ -14,8 +15,12 @@ const ManualRelayForm: React.FC<ManualRelayFormProps> = ({ chainId }) => {
     const [showNotification, setShowNotification] = useState(false)
     const [notificationMessage, setNotificationMessage] = useState('')
     const [loading, setLoading] = useState(false)
+    const router = useRouter()
 
-    const handleCloseNotification = () => setShowNotification(false)
+    const handleCloseNotification = () => {
+        setShowNotification(false)
+        router.push('/message')
+    }
     const handleShowNotification = (message: string) => {
         setNotificationMessage(message)
         setShowNotification(true)

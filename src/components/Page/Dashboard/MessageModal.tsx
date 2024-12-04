@@ -3,6 +3,7 @@ import NotificationModal from '@/components/Page/Dashboard/NotificationModal'
 import { executeRelay, findMissedBy } from '@/utils/relay-action'
 import { MissedRelayer } from '@/utils/relayer'
 import { Message } from '@/utils/xcall-fetcher'
+import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { Button, Modal } from 'react-bootstrap'
 
@@ -17,8 +18,13 @@ const MessageModal: React.FC<MessageModalProps> = ({ show, handleClose, message 
     const [modalMessage, setModalMessage] = useState('')
     const [showNotification, setShowNotification] = useState(false)
     const [loading, setLoading] = useState(false)
+    const router = useRouter()
 
-    const handleCloseNotification = () => setShowNotification(false)
+    const handleCloseNotification = () => {
+        setShowNotification(false)
+        handleClose()
+        router.push('/message')
+    }
     const handleShowModal = (message: string) => {
         setModalMessage(message)
         setShowNotification(true)
