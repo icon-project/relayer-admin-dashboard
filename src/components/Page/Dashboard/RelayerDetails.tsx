@@ -44,11 +44,18 @@ const RelayerDetails: FC<RelayDetailsProps> = ({ id }) => {
             <Card className="mb-4">
                 <CardHeader className="bg-primary text-white d-flex justify-content-between align-items-center">
                     <span>Relayer Details</span>
-                    <Link href="/chain" passHref>
-                        <Button variant="light" size="sm">
-                            View Chain List
-                        </Button>
-                    </Link>
+                    <div>
+                        <Link href="/chain" passHref>
+                            <Button variant="light" size="sm" className="me-2">
+                                Chain List
+                            </Button>
+                        </Link>
+                        <Link href="/message" passHref>
+                            <Button variant="light" size="sm">
+                                Messages
+                            </Button>
+                        </Link>
+                    </div>
                 </CardHeader>
                 <CardBody>
                     <Table striped bordered hover>
