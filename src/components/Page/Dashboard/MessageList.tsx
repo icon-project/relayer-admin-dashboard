@@ -45,7 +45,7 @@ const MessageList: React.FC = () => {
 
     const handleRemove = async (chain: string, messageId: number) => {
         try {
-            await fetch(`/api/relayer?event=RemoveMessage&sn=${messageId}&chain=${chain}`, {
+            await fetch(`/api/relayer?event=MessageRemove&sn=${messageId}&chain=${chain}`, {
                 method: 'DELETE',
             })
             fetchMessages()
