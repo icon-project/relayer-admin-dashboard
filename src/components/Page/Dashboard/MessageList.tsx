@@ -111,7 +111,9 @@ const MessageList: React.FC<MessageListProps> = ({ relayerId }) => {
                                             <td>{message.sn}</td>
                                             <td>{message.eventType}</td>
                                             <td>{message.messageHeight}</td>
-                                            <td>{moment(message.lastTry).format('YYYY-MM-DD HH:mm:ss')}</td>
+                                            <td>
+                                                {moment(message.lastTry).utc().local().format('YYYY-MM-DD HH:mm:ss')}
+                                            </td>
                                             <td>{message.retry}</td>
                                             <td>
                                                 <Button
