@@ -323,7 +323,7 @@ const MessageTable: FC<MessageTableProps> = ({ messages }) => {
                                                     {dict.dashboard.xcall.actions.deliver}
                                                 </DropdownItem>
                                             )}
-                                            {message.status === 'delivered' && !message.response_tx_hash && (
+                                            {message.status === 'delivered' && (
                                                 <DropdownItem onClick={() => handleShowModal(message)}>
                                                     {dict.dashboard.xcall.actions.execute}
                                                 </DropdownItem>
