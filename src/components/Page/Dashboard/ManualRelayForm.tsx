@@ -68,7 +68,7 @@ const ManualRelayForm: React.FC<ManualRelayFormProps> = ({ relayerId, nid }) => 
                                             value={txHash}
                                             onChange={(e) => setTxHash(e.target.value)}
                                         />
-                                        <Button variant="primary" type="submit">
+                                        <Button variant="primary" type="submit" disabled={!txHash}>
                                             Relay
                                         </Button>
                                     </InputGroup>
