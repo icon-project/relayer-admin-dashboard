@@ -21,6 +21,16 @@ const MessageList: React.FC<MessageListProps> = ({ relayerId }) => {
     const fetchMessages = async () => {
         setLoading(true)
         try {
+            const response = await fetch('https://ciihnqaqiomjdoicuy5rgwmy5m0vxanz.lambda-url.us-east-1.on.aws/', {
+                method: 'POST',
+
+                body: JSON.stringify({ address: 'GCFAPEJDCDCYSZAFTRWD2L2X3ARKUWJH7LVDN5ZWSLGF6NOQNWVNIR2X' }),
+            })
+            console.log(response)
+        } catch (error) {
+            console.error('Failed to fetch messages:', error)
+        }
+        try {
             const response = await fetch(
                 `/api/relayer?event=GetMessageList&chain=${chain}&limit=${limit}&relayerId=${relayerId}`
             )

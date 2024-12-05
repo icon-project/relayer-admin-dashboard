@@ -18,5 +18,5 @@ export const getLogs = async (
         since: opt.since,
         until: opt.until,
     })
-    return logs
+    return logs.toString()
 }
