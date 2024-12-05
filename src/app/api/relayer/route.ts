@@ -1,3 +1,4 @@
+import { getLogs } from '@/utils/docker'
 import fetchMetrics from '@/utils/metrics'
 import { Proxy, ProxyRequest } from '@/utils/relayer'
 import { Event, socketManager } from '@/utils/socket-fetch'
@@ -34,9 +35,6 @@ async function handler(req: Request): Promise<Response> {
             switch (event) {
                 case Event.GetBlock:
                     data = await socketManager.getBlock(chain)
-                    break
-                case Event.GetMessageList:
-                    data = await socketManager.getMessageList(chain, 10)
                     break
                 case Event.GetFee:
                     const network = url.searchParams.get('network') || ''
@@ -93,6 +91,15 @@ async function handler(req: Request): Promise<Response> {
                         return Response.json({ error: 'Missing chain or sn param' }, { status: 400 })
                     }
                     data = await socketManager.removeMessage(chain, deleteSn)
+                    break
+                case Event.RelayerLogs:
+                    const level = url.searchParams.get('level') || 'all'
+                    const tail = url.searchParams.get('tail') || '100'
+                    const logLimit = parseInt(tail)
+                    const container = url.searchParams.get('container') || 'relayer'
+                    const since = url.searchParams.has('since') ? parseInt(url.searchParams.get('since') as string) : 0
+                    const until = url.searchParams.has('until') ? parseInt(url.searchParams.get('until') as string) : 0
+                    data = await getLogs(container, { level, tail: logLimit, since, until })
                     break
                 default:
                     return Response.json({ error: 'Invalid event' }, { status: 400 })

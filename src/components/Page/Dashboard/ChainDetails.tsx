@@ -1,5 +1,6 @@
 'use client'
 
+import Loading from '@/components/Loading/Loading'
 import { ChainInfoResponse } from '@/utils/socket-fetch'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -7,11 +8,12 @@ import React, { useEffect, useState } from 'react'
 import { Button, Card, CardBody, CardHeader, Table } from 'react-bootstrap'
 
 interface ChainDetailsProps {
-    id: string
+    nid: string
+    relayerId: string
 }
 
-const fetchChainInfo = async (id: string): Promise<ChainInfoResponse> => {
-    const data = await fetch(`/api/relayer?chain=${id}&event=ListChainInfo`, {
+const fetchChainInfo = async (relayerId: string, id: string): Promise<ChainInfoResponse> => {
+    const data = await fetch(`/api/relayer?chain=${id}&event=ListChainInfo&relayerId=${relayerId}`, {
         method: 'POST',
         body: JSON.stringify({ chains: [id] }),
     }).then((res) => res.json())
@@ -21,19 +23,19 @@ const fetchChainInfo = async (id: string): Promise<ChainInfoResponse> => {
     return data[0]
 }
 
-const ChainDetails: React.FC<ChainDetailsProps> = ({ id }) => {
+const ChainDetails: React.FC<ChainDetailsProps> = ({ nid, relayerId }) => {
     const [chainInfo, setChainInfo] = useState<ChainInfoResponse | null>(null)
 
     useEffect(() => {
         const getChainInfo = async () => {
-            const data = await fetchChainInfo(id)
+            const data = await fetchChainInfo(relayerId, nid)
             setChainInfo(data)
         }
         getChainInfo()
-    }, [id])
+    }, [])
 
     if (!chainInfo) {
-        return <div>Loading...</div>
+        return <Loading />
     }
 
     return (
@@ -41,14 +43,14 @@ const ChainDetails: React.FC<ChainDetailsProps> = ({ id }) => {
             <CardHeader className="d-flex justify-content-between align-items-center">
                 <h1>Chain Details</h1>
                 <div>
-                    <Link href={`/chain/${chainInfo.nid}/relay`} passHref>
+                    <Link href={`${chainInfo.nid}/relay`} passHref>
                         <Button variant="primary" size="sm" className="me-2">
                             Manual Relay
                         </Button>
                     </Link>
-                    <Link href="/chain" passHref>
+                    <Link href={`/relayer/${relayerId}/chains`} passHref>
                         <Button variant="secondary" size="sm">
-                            View Chain List
+                            Chains
                         </Button>
                     </Link>
                 </div>

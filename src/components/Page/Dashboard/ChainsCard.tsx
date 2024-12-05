@@ -18,17 +18,18 @@ const ChainsCard: React.FC = () => {
     const [error, setError] = useState<string | null>(null)
     const { currentRelayer } = useRelayer()
     const dict = useDictionary()
+    const relayerId = currentRelayer?.id || 'self'
 
     useEffect(() => {
         const fetchChains = async () => {
             setLoading(true)
             try {
-                const response = await fetch(`/api/relayer?event=ListChainInfo`, {
+                const response = await fetch(`/api/relayer?event=ListChainInfo&relayerId=${relayerId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ relayerId: currentRelayer?.id }),
+                    body: JSON.stringify({ chains: [] }),
                 })
 
                 if (!response.ok) {
@@ -37,7 +38,7 @@ const ChainsCard: React.FC = () => {
 
                 const data: ChainInfoResponse[] = await response.json()
 
-                const balanceResponse = await fetch(`/api/relayer?event=GetChainBalance`, {
+                const balanceResponse = await fetch(`/api/relayer?event=GetChainBalance&relayerId=${relayerId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -86,7 +87,10 @@ const ChainsCard: React.FC = () => {
                             <Card.Body className="pb-0 d-flex justify-content-between align-items-start">
                                 <div>
                                     <div className="fs-4 fw-semibold">
-                                        <Link href={`/chain/${chain.nid}`} className="text-white text-decoration-none">
+                                        <Link
+                                            href={`/relayer/${relayerId}/chains/${chain.nid}`}
+                                            className="text-white text-decoration-none"
+                                        >
                                             {chain.name}
                                         </Link>{' '}
                                         <span className="fs-6 ms-2 fw-normal">({chain.type})</span>
@@ -109,10 +113,13 @@ const ChainsCard: React.FC = () => {
                                         <FontAwesomeIcon fixedWidth icon={faEllipsisVertical} />
                                     </DropdownToggle>
                                     <DropdownMenu>
-                                        <DropdownItem as={Link} href={`/chain/${chain.nid}/relay`}>
+                                        <DropdownItem
+                                            as={Link}
+                                            href={`/relayer/${relayerId}/chains/${chain.nid}/relay`}
+                                        >
                                             {dict.dashboard.action.relay}
                                         </DropdownItem>
-                                        <DropdownItem as={Link} href={`/chain/${chain.nid}`}>
+                                        <DropdownItem as={Link} href={`/relayer/${relayerId}/chains/${chain.nid}`}>
                                             {dict.dashboard.xcall.actions.view}
                                         </DropdownItem>
                                     </DropdownMenu>

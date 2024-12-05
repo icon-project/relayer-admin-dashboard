@@ -9,6 +9,9 @@ const nextConfig = {
   sassOptions: {
     includePaths: [ path.join(__dirname, 'styles') ],
   },
+  experimental: {
+    serverComponentsExternalPackages: ['dockerode'],
+  },
   images: {
     remotePatterns: [
       {

@@ -7,10 +7,11 @@ import React, { useState } from 'react'
 import { Alert, Button, Card, Col, Container, Form, FormControl, InputGroup, Row } from 'react-bootstrap'
 
 interface ManualRelayFormProps {
-    chainId: string
+    nid: string
+    relayerId: string
 }
 
-const ManualRelayForm: React.FC<ManualRelayFormProps> = ({ chainId }) => {
+const ManualRelayForm: React.FC<ManualRelayFormProps> = ({ relayerId, nid }) => {
     const [txHash, setTxHash] = useState('')
     const [showNotification, setShowNotification] = useState(false)
     const [notificationMessage, setNotificationMessage] = useState('')
@@ -19,7 +20,7 @@ const ManualRelayForm: React.FC<ManualRelayFormProps> = ({ chainId }) => {
 
     const handleCloseNotification = () => {
         setShowNotification(false)
-        router.push('/message')
+        router.push(`/relayer/${relayerId}/messages`)
     }
     const handleShowNotification = (message: string) => {
         setNotificationMessage(message)

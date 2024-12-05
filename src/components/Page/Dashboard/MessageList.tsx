@@ -1,14 +1,16 @@
 'use client'
 
 import Loading from '@/components/Loading/Loading'
-import { useRelayer } from '@/hooks/relayer/use-relayer-list'
 import { ChainInfoResponse, Message, MessageListResponse } from '@/utils/socket-fetch'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import { Button, Card, Col, Form, Row, Table } from 'react-bootstrap'
 
-const MessageList: React.FC = () => {
-    const { currentRelayer } = useRelayer()
+interface MessageListProps {
+    relayerId: string
+}
+
+const MessageList: React.FC<MessageListProps> = ({ relayerId }) => {
     const [chain, setChain] = useState<string>('')
     const [limit, setLimit] = useState<number>(10)
     const [messages, setMessages] = useState<Message[]>([])
@@ -19,7 +21,9 @@ const MessageList: React.FC = () => {
     const fetchMessages = async () => {
         setLoading(true)
         try {
-            const response = await fetch(`/api/relayer?event=GetMessageList&chain=${chain}&limit=${limit}`)
+            const response = await fetch(
+                `/api/relayer?event=GetMessageList&chain=${chain}&limit=${limit}&relayerId=${relayerId}`
+            )
             const data: MessageListResponse = await response.json()
             setMessages(data.message)
             setTotalMessages(data.total)
@@ -32,7 +36,7 @@ const MessageList: React.FC = () => {
 
     const fetchChains = async () => {
         try {
-            const response = await fetch('/api/relayer?event=ListChainInfo', {
+            const response = await fetch('/api/relayer?event=ListChainInfo&relayerId=self', {
                 method: 'POST',
                 body: JSON.stringify({ chains: [] }),
             })
@@ -45,7 +49,7 @@ const MessageList: React.FC = () => {
 
     const handleRemove = async (chain: string, messageId: number) => {
         try {
-            await fetch(`/api/relayer?event=MessageRemove&sn=${messageId}&chain=${chain}`, {
+            await fetch(`/api/relayer?event=MessageRemove&sn=${messageId}&chain=${chain}&relayerId=${relayerId}`, {
                 method: 'DELETE',
             })
             fetchMessages()
@@ -55,12 +59,9 @@ const MessageList: React.FC = () => {
     }
 
     useEffect(() => {
-        fetchChains()
-    }, [currentRelayer])
-
-    useEffect(() => {
         fetchMessages()
-    }, [chain, limit, currentRelayer])
+        fetchChains()
+    }, [chain, limit])
 
     return (
         <div className="flex justify-center">

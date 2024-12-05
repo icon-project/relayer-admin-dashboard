@@ -1,30 +1,31 @@
 'use client'
 
 import Loading from '@/components/Loading/Loading'
-import { useRelayer } from '@/hooks/relayer/use-relayer-list'
 import { ChainInfoResponse } from '@/utils/socket-fetch'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
-import { Button, Col, Container, Row, Table } from 'react-bootstrap'
+import { Button, Card, Table } from 'react-bootstrap'
 
-const ChainList: React.FC = () => {
+interface ChainListProps {
+    relayerId: string
+}
+
+const ChainList: React.FC<ChainListProps> = ({ relayerId }) => {
     const [chains, setChains] = useState<ChainInfoResponse[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
-    const { currentRelayer } = useRelayer()
     const router = useRouter()
 
     useEffect(() => {
         const fetchChains = async () => {
             setLoading(true)
-            const relayerId = currentRelayer?.id ?? ''
             try {
-                const response = await fetch(`/api/relayer?event=ListChainInfo`, {
+                const response = await fetch(`/api/relayer?event=ListChainInfo&relayerId=${relayerId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ relayerId }),
+                    body: JSON.stringify({ chains: [] }),
                 })
 
                 if (!response.ok) {
@@ -39,19 +40,20 @@ const ChainList: React.FC = () => {
                 setLoading(false)
             }
         }
-
         fetchChains()
-    }, [currentRelayer])
+    }, [])
 
     const handleShowDetails = (id: string) => {
-        router.push(`/chain/${id}`)
+        router.push(`chains/${id}`)
     }
 
     return (
-        <Container>
-            <Row className="justify-content-md-center">
-                <Col md="10">
-                    <h1>Chain List</h1>
+        <div className="flex justify-center">
+            <Card className="mb-4">
+                <Card.Header className="bg-primary text-white d-flex justify-content-between align-items-center">
+                    <span>Chains</span>
+                </Card.Header>
+                <Card.Body>
                     {loading && <Loading />}
                     {error && <p className="text-danger">{error}</p>}
                     {!loading && !error && (
@@ -88,11 +90,18 @@ const ChainList: React.FC = () => {
                                     </tr>
                                 ))}
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colSpan={7} className="text-end">
+                                        Total: {chains.length}
+                                    </td>
+                                </tr>
+                            </tfoot>
                         </Table>
                     )}
-                </Col>
-            </Row>
-        </Container>
+                </Card.Body>
+            </Card>
+        </div>
     )
 }
 

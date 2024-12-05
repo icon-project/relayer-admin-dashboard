@@ -5,7 +5,7 @@ import moment from 'moment'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { FC, useEffect, useState } from 'react'
-import { Button, Card, CardBody, CardHeader, Table } from 'react-bootstrap'
+import { Button, Card, CardBody, CardHeader, Col, Row, Table } from 'react-bootstrap'
 
 const fetchRelayer = async (id: string): Promise<RelayInfo> => {
     const data = await fetch(`/api/relayer?relayerId=${id}&event=RelayerInfo`).then((res) => res.json())
@@ -44,18 +44,29 @@ const RelayerDetails: FC<RelayDetailsProps> = ({ id }) => {
             <Card className="mb-4">
                 <CardHeader className="bg-primary text-white d-flex justify-content-between align-items-center">
                     <span>Relayer Details</span>
-                    <div>
-                        <Link href="/chain" passHref>
-                            <Button variant="light" size="sm" className="me-2">
-                                Chain List
-                            </Button>
-                        </Link>
-                        <Link href="/message" passHref>
-                            <Button variant="light" size="sm">
-                                Messages
-                            </Button>
-                        </Link>
-                    </div>
+                    <Row>
+                        <Col>
+                            <Link href={`/relayer/${id}/chains`} passHref>
+                                <Button variant="light" size="sm">
+                                    Chains
+                                </Button>
+                            </Link>
+                        </Col>
+                        <Col>
+                            <Link href={`/relayer/${id}/messages`} passHref>
+                                <Button variant="light" size="sm">
+                                    Messages
+                                </Button>
+                            </Link>
+                        </Col>
+                        <Col>
+                            <Link href={`/relayer/${id}/logs`} passHref>
+                                <Button variant="light" size="sm">
+                                    Logs
+                                </Button>
+                            </Link>
+                        </Col>
+                    </Row>
                 </CardHeader>
                 <CardBody>
                     <Table striped bordered hover>

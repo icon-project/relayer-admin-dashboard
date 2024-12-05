@@ -13,7 +13,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { FC, Suspense, useEffect, useState } from 'react'
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle, FormSelect, ProgressBar } from 'react-bootstrap'
-import MessageModal from './MessageModal' // Import the modal component
+import MessageModal from './MessageModal'
 
 const getStatusPercentage = (status: string) => {
     switch (status) {
@@ -323,7 +323,7 @@ const MessageTable: FC<MessageTableProps> = ({ messages }) => {
                                                     {dict.dashboard.xcall.actions.deliver}
                                                 </DropdownItem>
                                             )}
-                                            {message.status === 'delivered' && (
+                                            {message.status === 'delivered' && message.response_tx_hash === '' && (
                                                 <DropdownItem onClick={() => handleShowModal(message)}>
                                                     {dict.dashboard.xcall.actions.execute}
                                                 </DropdownItem>

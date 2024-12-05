@@ -15,6 +15,7 @@ export enum Event {
     GetChainBalance = 'GetChainBalance',
     GetBlockEvents = 'GetBlockEvents',
     RelayerInfo = 'RelayerInfo',
+    RelayerLogs = 'RelayerLogs',
 }
 
 interface Packet {

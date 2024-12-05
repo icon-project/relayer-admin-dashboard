@@ -20,6 +20,9 @@ export default async function SidebarNav() {
                 {dict.sidebar.items.dashboard}
             </SidebarNavItem>
             <SidebarNavGroup toggleIcon={faTowerCell} toggleText={dict.sidebar.items.relayers}>
+                <SidebarNavItem key="self" href="/relayer/self">
+                    Self
+                </SidebarNavItem>
                 {relayers.length === 0 && (
                     <SidebarNavItem href="/relayer/add">{dict.sidebar.items.add_relayer}</SidebarNavItem>
                 )}
