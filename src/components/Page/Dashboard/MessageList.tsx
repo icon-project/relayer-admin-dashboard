@@ -28,8 +28,8 @@ const MessageList: React.FC<MessageListProps> = ({ relayerId }) => {
             const sortedMessages = data?.message.sort(
                 (a, b) => new Date(b.lastTry).getTime() - new Date(a.lastTry).getTime()
             )
-            setMessages(sortedMessages)
-            setTotalMessages(data.total)
+            setMessages(sortedMessages || [])
+            setTotalMessages(data?.total || 0)
         } catch (error) {
             console.error('Failed to fetch messages:', error)
         } finally {
