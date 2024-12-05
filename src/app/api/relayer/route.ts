@@ -86,7 +86,7 @@ async function handler(req: Request): Promise<Response> {
                     data = await socketManager.getMessageList(chain, limit)
                     break
                 case Event.MessageRemove:
-                    const deleteSn = url.searchParams.get('sn')
+                    const deleteSn = url.searchParams.has('sn') ? parseInt(url.searchParams.get('sn') as string) : 0
                     if (!chain || !deleteSn) {
                         return Response.json({ error: 'Missing chain or sn param' }, { status: 400 })
                     }
