@@ -25,7 +25,8 @@ const MessageList: React.FC<MessageListProps> = ({ relayerId }) => {
                 `/api/relayer?event=GetMessageList&chain=${chain}&limit=${limit}&relayerId=${relayerId}`
             )
             const data: MessageListResponse = await response.json()
-            const sortLastTry = data?.message.sort(
+
+            const sortLastTry = data?.message?.sort(
                 (a, b) => new Date(b.lastTry).getTime() - new Date(a.lastTry).getTime()
             )
             const sortedMessages = sortLastTry?.sort((a, b) => b.sn - a.sn)
