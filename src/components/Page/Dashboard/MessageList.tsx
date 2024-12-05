@@ -25,7 +25,10 @@ const MessageList: React.FC<MessageListProps> = ({ relayerId }) => {
                 `/api/relayer?event=GetMessageList&chain=${chain}&limit=${limit}&relayerId=${relayerId}`
             )
             const data: MessageListResponse = await response.json()
-            setMessages(data.message.sort((a, b) => new Date(b.lastTry).getTime() - new Date(a.lastTry).getTime()))
+            const sortedMessages = data?.message.sort(
+                (a, b) => new Date(b.lastTry).getTime() - new Date(a.lastTry).getTime()
+            )
+            setMessages(sortedMessages)
             setTotalMessages(data.total)
         } catch (error) {
             console.error('Failed to fetch messages:', error)
