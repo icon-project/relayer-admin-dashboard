@@ -288,8 +288,8 @@ class SocketManager extends EventEmitter {
         return this.sendRequest<RelayInfo>(Event.RelayerInfo)
     }
 
-    public async removeMessage(chain: string, id: string): Promise<void> {
-        const data = { chain, id }
+    public async removeMessage(chain: string, sn: string): Promise<void> {
+        const data = { chain, sn }
         return this.sendRequest<void>(Event.MessageRemove, data)
     }
 }
