@@ -8,7 +8,7 @@ import fetchMetrics, { SystemMetrics } from '@/utils/metrics'
 import { fetchMessages } from '@/utils/xcall-fetcher'
 
 import { Suspense } from 'react'
-import { Card, CardBody, CardFooter, CardHeader, ProgressBar } from 'react-bootstrap'
+import { Card, CardBody, CardFooter, CardHeader, Col, ProgressBar, Row } from 'react-bootstrap'
 
 export default async function Page() {
     const dict = await getDictionary()
@@ -65,8 +65,8 @@ export default async function Page() {
                 </CardFooter>
             </Card>
 
-            <div className="row">
-                <div className="col-md-12">
+            <Row>
+                <Col md="12">
                     <Card>
                         <CardHeader>{dict.dashboard.xcall.title}</CardHeader>
                         <CardBody>
@@ -75,8 +75,8 @@ export default async function Page() {
                             <MessageTable messages={messages} />
                         </CardBody>
                     </Card>
-                </div>
-            </div>
+                </Col>
+            </Row>
         </Suspense>
     )
 }

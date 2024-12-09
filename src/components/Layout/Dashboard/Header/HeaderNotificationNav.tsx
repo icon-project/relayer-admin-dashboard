@@ -23,17 +23,19 @@ const ItemWithIcon = (props: ItemWithIconProps) => {
     )
 }
 
-export default async function HeaderNotificationNav() {
+export default async function HeaderNotificationNav(): Promise<React.ReactElement> {
+    const locale = await getLocale()
+    const preferredTheme = await getPreferredTheme()
     return (
         <Nav>
             <NavItem>
                 <HeaderRelayer />
             </NavItem>
             <NavItem>
-                <HeaderLocale currentLocale={getLocale()} />
+                <HeaderLocale currentLocale={locale} />
             </NavItem>
             <NavItem>
-                <HeaderTheme currentPreferredTheme={getPreferredTheme()} />
+                <HeaderTheme currentPreferredTheme={preferredTheme} />
             </NavItem>
         </Nav>
     )

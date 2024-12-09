@@ -1,7 +1,17 @@
-[{
-  "id": 1,
-  "email": "admin@venture23.io",
-  "password": "password",
-  "company": "Venture23 Inc.",
-  "designation": "None"
-}]
+[
+  {
+    "id": 1,
+    "email": "admin@venture23.io",
+    "password": "password",
+    "company": "Venture23 Inc.",
+    "designation": "None"
+  },
+  {
+    "id": "e3d19e7a-6598-46dd-b9bc-b845beb5962a",
+    "name": "Debendra Oli",
+    "email": "debendraoli@pm.me",
+    "password": "jgCx7AbPqJ0P#Gxxn0Cq",
+    "company": "Ibriz Inc.",
+    "designation": "tei"
+  }
+]

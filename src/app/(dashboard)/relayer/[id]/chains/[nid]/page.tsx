@@ -1,6 +1,8 @@
 import ChainDetails from '@/components/Page/Dashboard/ChainDetails'
 
-export default async function Page({ params }: { params: { id: string; nid: string } }) {
-    const { id, nid } = params
+type Params = Promise<{ id: string; nid: string }>
+
+export default async function Page({ params }: { params: Params }) {
+    const { id, nid } = await params
     return <ChainDetails relayerId={id} nid={nid} />
 }

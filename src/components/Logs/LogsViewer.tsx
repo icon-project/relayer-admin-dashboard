@@ -11,26 +11,28 @@ interface LogsViewerProps {
 const LogsViewer: React.FC<LogsViewerProps> = ({ relayerId }) => {
     const [logs, setLogs] = useState<string[]>([])
     const [tail, setTail] = useState<number>(100)
-    const [level, setLevel] = useState<string>('all')
     const [searchTerm, setSearchTerm] = useState<string>('')
     const [since, setSince] = useState<string>('')
     const [until, setUntil] = useState<string>('')
-    const [loading, setLoading] = useState<boolean>(false)
+    const [initialLoad, setInitialLoad] = useState<boolean>(true)
 
     const fetchLogs = async () => {
-        setLoading(true)
         try {
             const sinceTimestamp = since ? new Date(since).getTime() / 1000 : 0
             const untilTimestamp = until ? new Date(until).getTime() / 1000 : 0
             const response = await fetch(
-                `/api/relayer?event=RelayerLogs&level=${level}&tail=${tail}&relayerId=${relayerId}&since=${sinceTimestamp}&until=${untilTimestamp}`
+                `/api/relayer?event=RelayerLogs&tail=${tail}&relayerId=${relayerId}&since=${sinceTimestamp}&until=${untilTimestamp}`
             )
             const data = await response.json()
-            setLogs(data?.trim().split('\n').reverse())
+            setLogs(data?.reverse())
+            if (!since && data.length > 0) {
+                const lastLogTimestamp = new Date()
+                setSince(`${lastLogTimestamp}`)
+            }
         } catch (error) {
             console.error('Failed to fetch logs:', error)
         } finally {
-            setLoading(false)
+            setInitialLoad(false)
         }
     }
 
@@ -38,29 +40,15 @@ const LogsViewer: React.FC<LogsViewerProps> = ({ relayerId }) => {
         fetchLogs()
         const interval = setInterval(fetchLogs, 5000)
         return () => clearInterval(interval)
-    }, [level, tail, since, until])
+    }, [tail, since, until])
 
     const filteredLogs = logs.filter((log) => log.toLowerCase().includes(searchTerm.toLowerCase())).join('\n')
 
     return (
         <Card>
             <Card.Header className="bg-primary text-white">
-                <h4>Logs</h4>
+                <Card.Title>Logs</Card.Title>
                 <Row>
-                    <Col md={1}>
-                        <Form.Group controlId="levelSelect">
-                            <Form.Label>Filter</Form.Label>
-                            <Form.Control
-                                as="select"
-                                className="sm"
-                                value={level}
-                                onChange={(e) => setLevel(e.target.value)}
-                            >
-                                <option value="all">All</option>
-                                <option value="error">Errors</option>
-                            </Form.Control>
-                        </Form.Group>
-                    </Col>
                     <Col md={1}>
                         <Form.Group controlId="tailSelect">
                             <Form.Label>Total</Form.Label>
@@ -106,7 +94,7 @@ const LogsViewer: React.FC<LogsViewerProps> = ({ relayerId }) => {
                 </Row>
             </Card.Header>
             <Card.Body>
-                {loading ? (
+                {initialLoad ? (
                     <div className="d-flex justify-content-center mt-3">
                         <Loading />
                     </div>
@@ -121,7 +109,7 @@ const LogsViewer: React.FC<LogsViewerProps> = ({ relayerId }) => {
                             padding: '1px',
                         }}
                     >
-                        {filteredLogs}
+                        {filteredLogs.length > 0 ? filteredLogs : 'No logs found'}
                     </pre>
                 )}
             </Card.Body>

@@ -7,7 +7,7 @@ import { cookies } from 'next/headers'
 async function handler(req: Request): Promise<Response> {
     const url = new URL(req.url)
     const event = url.searchParams.get('event') as Event
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const relayerId = url.searchParams.get('relayerId') || cookieStore.get('relayerId')?.value
     if (!event) {
         return Response.json({ error: 'Missing event parameter' }, { status: 400 })
@@ -93,13 +93,11 @@ async function handler(req: Request): Promise<Response> {
                     data = await socketManager.removeMessage(chain, deleteSn)
                     break
                 case Event.RelayerLogs:
-                    const level = url.searchParams.get('level') || 'all'
-                    const tail = url.searchParams.get('tail') || '100'
-                    const logLimit = parseInt(tail)
+                    const tail = url.searchParams.has('tail') ? parseInt(url.searchParams.get('tail') as string) : 100
                     const container = url.searchParams.get('container') || 'relayer'
                     const since = url.searchParams.has('since') ? parseInt(url.searchParams.get('since') as string) : 0
                     const until = url.searchParams.has('until') ? parseInt(url.searchParams.get('until') as string) : 0
-                    data = await getLogs(container, { level, tail: logLimit, since, until })
+                    data = await getLogs(container, { tail, since, until })
                     break
                 default:
                     return Response.json({ error: 'Invalid event' }, { status: 400 })

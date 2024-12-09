@@ -1,10 +1,14 @@
-name: Release Debian package
+name: Build, package and release
 
 on:
-  push:
-    tags:
-      - "v*.*.*" # run on semver tags
-      - "v*.*.*-*" # run on pre-release tags
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build and release'
+        required: true
+      is_stable:
+        description: 'Is this a stable release?'
+        default: 'false'
 
 jobs:
   build:
@@ -16,7 +20,7 @@ jobs:
       - uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
-        run: bun install
+        run: bun install --frozen-lockfile
 
       - name: Build Next.js application
         run: bun run build
@@ -38,20 +42,6 @@ jobs:
 
       - name: Build Debian package
         run: dpkg-deb --build debian relayer-admin-dashboard.deb
-
-      - name: Upload Debian package
-        uses: actions/upload-artifact@v4
-        with:
-          name: relayer-admin-dashboard-debian
-          path: relayer-admin-dashboard.deb
-
-      - name: Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: relayer-admin-dashboard.deb
-          generate_release_notes: true
-          make_latest: true
-          prerelease: ${{ contains(github.ref_name, '-') }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -83,7 +73,7 @@ jobs:
       - name: Install cosign
         uses: sigstore/cosign-installer@v3
 
-      - name: Sign relayer image
+      - name: Sign artifacts
         env:
           COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
@@ -91,3 +81,20 @@ jobs:
         run: |
           cosign sign --key env://COSIGN_PRIVATE_KEY iconcommunity/relayer-admin-dashboard:latest
           cosign sign --key env://COSIGN_PRIVATE_KEY iconcommunity/relayer-admin-dashboard:${{ github.ref_name }}
+          cosign sign-blob --key env://COSIGN_PRIVATE_KEY relayer-admin-dashboard.deb
+          cosign public-key --key env://COSIGN_PRIVATE_KEY > cosign.pub
+
+      - name: Create release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            relayer-admin-dashboard.deb
+            relayer-admin-dashboard.deb.sig
+            cosign.pub
+          tag_name: ${{ github.ref_name }}
+          body: |
+            Release ${{ github.ref_name }}
+          draft: false
+          make_latest: ${{ github.ref_name == 'v*.*.*' && inputs.is_stable == 'true' }}
+          prerelease: ${{ github.ref_name == 'v*.*.*-*' }}

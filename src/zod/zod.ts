@@ -6,14 +6,14 @@ import enTranslation from 'zod-i18n-map/locales/en/zod.json'
 
 const en = i18next.createInstance()
 en.init({
-  lng: 'en',
-  resources: {
-    en: { zod: enTranslation },
-  },
+    lng: 'en',
+    resources: {
+        en: { zod: enTranslation },
+    },
 })
 
 const zodMap = {
-  en: makeZodI18nMap({ t: en.t }),
+    en: makeZodI18nMap({ t: en.t }),
 }
 
 // Set zod error map by user's locale.

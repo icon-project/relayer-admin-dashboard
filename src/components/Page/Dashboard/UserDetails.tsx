@@ -31,26 +31,24 @@ const UserDetails: FC<UserDetailsProps> = ({ user }) => {
                 <tr>
                     <td>Password</td>
                     <td>
-                        <div className="d-flex align-items-center">
-                            <span>{showPassword ? user.password : '••••••••'}</span>
-                            <Button
-                                variant="outline-secondary"
-                                size="sm"
-                                className="ml-2"
-                                onClick={togglePasswordVisibility}
-                            >
-                                {showPassword ? (
-                                    <FontAwesomeIcon icon={faEyeLowVision} />
-                                ) : (
-                                    <FontAwesomeIcon icon={faEye} />
-                                )}
+                        <span className="mr-5">{showPassword ? user.password : '********'}</span>
+                        <Button
+                            variant="outline-secondary"
+                            size="sm"
+                            className="ml-2"
+                            onClick={togglePasswordVisibility}
+                        >
+                            {showPassword ? (
+                                <FontAwesomeIcon icon={faEyeLowVision} />
+                            ) : (
+                                <FontAwesomeIcon icon={faEye} />
+                            )}
+                        </Button>
+                        <CopyToClipboard text={user.password}>
+                            <Button variant="outline-secondary" size="sm" className="ml-2">
+                                <FontAwesomeIcon icon={faCopy} />
                             </Button>
-                            <CopyToClipboard text={user.password}>
-                                <Button variant="outline-secondary" size="sm" className="ml-2">
-                                    <FontAwesomeIcon icon={faCopy} /> Copy
-                                </Button>
-                            </CopyToClipboard>
-                        </div>
+                        </CopyToClipboard>
                     </td>
                 </tr>
                 <tr>

@@ -20,9 +20,13 @@ config.autoAddCss = false
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
     const dictionary = await getDictionary()
     const relayers = await getAvailableRelayers()
+    const theme = await getTheme()
 
     return (
-        <html lang={defaultLocale} data-bs-theme={getTheme()}>
+        <html lang={defaultLocale} data-bs-theme={theme}>
+            <head>
+                <title>Relayer Dashboard</title>
+            </head>
             <body>
                 <ProgressBar />
                 <DictionaryProvider dictionary={dictionary}>

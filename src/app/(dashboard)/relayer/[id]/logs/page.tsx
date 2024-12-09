@@ -1,6 +1,8 @@
 import LogsViewer from '@/components/Logs/LogsViewer'
 
-export default async function Page({ params }: { params: { id: string } }) {
-    const { id } = params
+type Params = Promise<{ id: string }>
+
+export default async function Page({ params }: { params: Params }) {
+    const { id } = await params
     return <LogsViewer relayerId={id} />
 }

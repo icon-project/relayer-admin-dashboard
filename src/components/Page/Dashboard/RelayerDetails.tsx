@@ -40,50 +40,48 @@ const RelayerDetails: FC<RelayDetailsProps> = ({ id }) => {
     }
 
     return (
-        <div className="flex justify-center">
-            <Card className="mb-4">
-                <CardHeader className="bg-primary text-white d-flex justify-content-between align-items-center">
-                    <span>Relayer Details</span>
-                    <Row>
-                        <Col>
-                            <Link href={`/relayer/${id}/chains`} passHref>
-                                <Button variant="light" size="sm">
-                                    Chains
-                                </Button>
-                            </Link>
-                        </Col>
-                        <Col>
-                            <Link href={`/relayer/${id}/messages`} passHref>
-                                <Button variant="light" size="sm">
-                                    Messages
-                                </Button>
-                            </Link>
-                        </Col>
-                        <Col>
-                            <Link href={`/relayer/${id}/logs`} passHref>
-                                <Button variant="light" size="sm">
-                                    Logs
-                                </Button>
-                            </Link>
-                        </Col>
-                    </Row>
-                </CardHeader>
-                <CardBody>
-                    <Table striped bordered hover>
-                        <tbody>
-                            <tr>
-                                <td>Version</td>
-                                <td>{chainInfo.version}</td>
-                            </tr>
-                            <tr>
-                                <td>Uptime</td>
-                                <td>{formatDate(chainInfo.uptime)}</td>
-                            </tr>
-                        </tbody>
-                    </Table>
-                </CardBody>
-            </Card>
-        </div>
+        <Card className="mb-4">
+            <CardHeader className="bg-primary text-white d-flex justify-content-between">
+                <span>Relayer Details</span>
+                <Row>
+                    <Col>
+                        <Link href={`/relayer/${id}/chains`} passHref>
+                            <Button variant="light" size="sm">
+                                Chains
+                            </Button>
+                        </Link>
+                    </Col>
+                    <Col>
+                        <Link href={`/relayer/${id}/messages`} passHref>
+                            <Button variant="light" size="sm">
+                                Messages
+                            </Button>
+                        </Link>
+                    </Col>
+                    <Col>
+                        <Link href={`/relayer/${id}/logs`} passHref>
+                            <Button variant="light" size="sm">
+                                Logs
+                            </Button>
+                        </Link>
+                    </Col>
+                </Row>
+            </CardHeader>
+            <CardBody>
+                <Table striped bordered hover>
+                    <tbody>
+                        <tr>
+                            <td>Version</td>
+                            <td>{chainInfo.version}</td>
+                        </tr>
+                        <tr>
+                            <td>Uptime</td>
+                            <td>{formatDate(chainInfo.uptime)}</td>
+                        </tr>
+                    </tbody>
+                </Table>
+            </CardBody>
+        </Card>
     )
 }
 

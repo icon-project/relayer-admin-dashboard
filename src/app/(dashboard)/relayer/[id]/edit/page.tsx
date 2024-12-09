@@ -1,19 +1,21 @@
 import EditRelayerForm from '@/components/Page/Dashboard/EditRelayerForm'
 import { getRelayerById } from '@/utils/relayer'
-import { Col, Container, Row } from 'react-bootstrap'
+import { Card, CardBody, CardHeader, CardTitle } from 'react-bootstrap'
 
-export default async function Page({ params }: { params: { id: string } }) {
-    const id = params.id
+type Params = Promise<{ id: string }>
+
+export default async function Page({ params }: { params: Params }) {
+    const { id } = await params
     const relayer = await getRelayerById(id)
 
     return (
-        <Container>
-            <Row className="justify-content-md-center">
-                <Col md="6">
-                    <h1>Edit Relayer</h1>
-                    <EditRelayerForm relayer={relayer} />
-                </Col>
-            </Row>
-        </Container>
+        <Card>
+            <CardHeader>
+                <CardTitle>Edit Relayer</CardTitle>
+            </CardHeader>
+            <CardBody>
+                <EditRelayerForm relayer={relayer} />
+            </CardBody>
+        </Card>
     )
 }

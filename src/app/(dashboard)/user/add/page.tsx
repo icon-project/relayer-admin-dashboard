@@ -1,15 +1,15 @@
 import UserAddForm from '@/components/Page/Dashboard/UserAddForm'
-import { Col, Container, Row } from 'react-bootstrap'
+import { Card, CardBody, CardHeader, CardTitle } from 'react-bootstrap'
 
 export default function Page() {
     return (
-        <Container>
-            <Row className="justify-content-md-center">
-                <Col md="6">
-                    <h1>Add User</h1>
+        <Card>
+            <CardHeader>
+                <CardTitle>Add User</CardTitle>
+                <CardBody>
                     <UserAddForm />
-                </Col>
-            </Row>
-        </Container>
+                </CardBody>
+            </CardHeader>
+        </Card>
     )
 }

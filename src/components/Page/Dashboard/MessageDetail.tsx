@@ -46,164 +46,158 @@ const MessageDetail: FC<Props> = ({ message }) => {
     }
 
     return (
-        <div className="flex justify-center">
-            <Card className="mb-4">
-                <CardHeader className="bg-primary text-white d-flex justify-content-between align-items-center">
-                    <span>
-                        {data.src_network} -{'>'} {data.dest_network}
-                    </span>
-                    {(data.status === 'pending' || data.status === 'delivered') && (
-                        <Button variant="light" onClick={handleShowModal}>
-                            Relay Message
-                        </Button>
-                    )}
-                </CardHeader>
-                <CardBody>
-                    <Table striped bordered hover>
-                        <thead>
-                            <tr>
-                                <th>Field</th>
-                                <th>Source</th>
-                                <th>Destination</th>
-                                <th>Response</th>
-                                <th>Rollback</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Network</td>
-                                <td>{data.src_network}</td>
-                                <td>{data.dest_network}</td>
-                                <td colSpan={2}></td>
-                            </tr>
-                            <tr>
-                                <td>Block Number</td>
-                                <td>
-                                    {data.src_block_number}
-                                    <CopyToClipboard text={data.src_block_number || ''}>
+        <Card className="mb-4">
+            <CardHeader className="bg-primary text-white d-flex justify-content-between align-items-center">
+                <span>
+                    {data.src_network} -{'>'} {data.dest_network}
+                </span>
+                {(data.status === 'pending' || data.status === 'delivered') && (
+                    <Button variant="light" onClick={handleShowModal}>
+                        Relay Message
+                    </Button>
+                )}
+            </CardHeader>
+            <CardBody>
+                <Table striped bordered hover>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Source</th>
+                            <th>Destination</th>
+                            <th>Response</th>
+                            <th>Rollback</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Network</td>
+                            <td>{data.src_network}</td>
+                            <td>{data.dest_network}</td>
+                            <td colSpan={2}></td>
+                        </tr>
+                        <tr>
+                            <td>Block Number</td>
+                            <td>
+                                {data.src_block_number}
+                                <CopyToClipboard text={data.src_block_number || ''}>
+                                    <Button variant="link" className="text-decoration-none">
+                                        <FontAwesomeIcon icon={faClipboard} />
+                                    </Button>
+                                </CopyToClipboard>
+                            </td>
+                            <td>
+                                {data.dest_block_number || ''}
+                                <CopyToClipboard text={data.dest_block_number || ''}>
+                                    <Button variant="link" className="text-decoration-none">
+                                        <FontAwesomeIcon icon={faClipboard} />
+                                    </Button>
+                                </CopyToClipboard>
+                            </td>
+                            <td>
+                                {data.response_block_number || ''}
+                                {data.response_block_number && (
+                                    <CopyToClipboard text={data.response_block_number || ''}>
                                         <Button variant="link" className="text-decoration-none">
                                             <FontAwesomeIcon icon={faClipboard} />
                                         </Button>
                                     </CopyToClipboard>
-                                </td>
-                                <td>
-                                    {data.dest_block_number || ''}
-                                    <CopyToClipboard text={data.dest_block_number || ''}>
+                                )}
+                            </td>
+                            <td>
+                                {data.rollback_block_number || ''}
+                                {data.rollback_block_number && (
+                                    <CopyToClipboard text={data.rollback_block_number || ''}>
                                         <Button variant="link" className="text-decoration-none">
                                             <FontAwesomeIcon icon={faClipboard} />
                                         </Button>
                                     </CopyToClipboard>
-                                </td>
-                                <td>
-                                    {data.response_block_number || ''}
-                                    {data.response_block_number && (
-                                        <CopyToClipboard text={data.response_block_number || ''}>
-                                            <Button variant="link" className="text-decoration-none">
-                                                <FontAwesomeIcon icon={faClipboard} />
-                                            </Button>
-                                        </CopyToClipboard>
-                                    )}
-                                </td>
-                                <td>
-                                    {data.rollback_block_number || ''}
-                                    {data.rollback_block_number && (
-                                        <CopyToClipboard text={data.rollback_block_number || ''}>
-                                            <Button variant="link" className="text-decoration-none">
-                                                <FontAwesomeIcon icon={faClipboard} />
-                                            </Button>
-                                        </CopyToClipboard>
-                                    )}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Block Timestamp</td>
-                                <td>{formatDate(data.src_block_timestamp)}</td>
-                                <td>{data.dest_block_timestamp ? formatDate(data.dest_block_timestamp) : ''}</td>
-                                <td>
-                                    {data.response_block_timestamp ? formatDate(data.response_block_timestamp) : ''}
-                                </td>
-                                <td>
-                                    {data.rollback_block_timestamp ? formatDate(data.rollback_block_timestamp) : ''}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>TX Hash</td>
-                                <td>
-                                    {renderLink(data.src_network, data.src_tx_hash, false)}
-                                    <CopyToClipboard text={data.src_tx_hash || ''}>
+                                )}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Block Timestamp</td>
+                            <td>{formatDate(data.src_block_timestamp)}</td>
+                            <td>{data.dest_block_timestamp ? formatDate(data.dest_block_timestamp) : ''}</td>
+                            <td>{data.response_block_timestamp ? formatDate(data.response_block_timestamp) : ''}</td>
+                            <td>{data.rollback_block_timestamp ? formatDate(data.rollback_block_timestamp) : ''}</td>
+                        </tr>
+                        <tr>
+                            <td>TX Hash</td>
+                            <td>
+                                {renderLink(data.src_network, data.src_tx_hash, false)}
+                                <CopyToClipboard text={data.src_tx_hash || ''}>
+                                    <Button variant="link" className="text-decoration-none">
+                                        <FontAwesomeIcon icon={faClipboard} />
+                                    </Button>
+                                </CopyToClipboard>
+                            </td>
+                            <td>
+                                {renderLink(data.dest_network, data.dest_tx_hash, false)}
+                                <CopyToClipboard text={data.dest_tx_hash || ''}>
+                                    <Button variant="link" className="text-decoration-none">
+                                        <FontAwesomeIcon icon={faClipboard} />
+                                    </Button>
+                                </CopyToClipboard>
+                            </td>
+                            <td>
+                                {renderLink(data.dest_network, data.response_tx_hash, false)}
+                                {data.response_tx_hash && (
+                                    <CopyToClipboard text={data.response_tx_hash || ''}>
                                         <Button variant="link" className="text-decoration-none">
                                             <FontAwesomeIcon icon={faClipboard} />
                                         </Button>
                                     </CopyToClipboard>
-                                </td>
-                                <td>
-                                    {renderLink(data.dest_network, data.dest_tx_hash, false)}
-                                    <CopyToClipboard text={data.dest_tx_hash || ''}>
+                                )}
+                            </td>
+                            <td>
+                                {renderLink(data.dest_network, data.rollback_tx_hash, false)}
+                                {data.rollback_tx_hash && (
+                                    <CopyToClipboard text={data.rollback_tx_hash || ''}>
                                         <Button variant="link" className="text-decoration-none">
                                             <FontAwesomeIcon icon={faClipboard} />
                                         </Button>
                                     </CopyToClipboard>
-                                </td>
-                                <td>
-                                    {renderLink(data.dest_network, data.response_tx_hash, false)}
-                                    {data.response_tx_hash && (
-                                        <CopyToClipboard text={data.response_tx_hash || ''}>
-                                            <Button variant="link" className="text-decoration-none">
-                                                <FontAwesomeIcon icon={faClipboard} />
-                                            </Button>
-                                        </CopyToClipboard>
-                                    )}
-                                </td>
-                                <td>
-                                    {renderLink(data.dest_network, data.rollback_tx_hash, false)}
-                                    {data.rollback_tx_hash && (
-                                        <CopyToClipboard text={data.rollback_tx_hash || ''}>
-                                            <Button variant="link" className="text-decoration-none">
-                                                <FontAwesomeIcon icon={faClipboard} />
-                                            </Button>
-                                        </CopyToClipboard>
-                                    )}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Address</td>
-                                <td>
-                                    {renderLink(data.src_network, data.src_address, true)}
-                                    <CopyToClipboard text={data.src_address || ''}>
+                                )}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Address</td>
+                            <td>
+                                {renderLink(data.src_network, data.src_address, true)}
+                                <CopyToClipboard text={data.src_address || ''}>
+                                    <Button variant="link" className="text-decoration-none">
+                                        <FontAwesomeIcon icon={faClipboard} />
+                                    </Button>
+                                </CopyToClipboard>
+                            </td>
+                            <td>
+                                {renderLink(data.dest_network, data.dest_address, true)}
+                                {data.dest_address && (
+                                    <CopyToClipboard text={data.dest_address || ''}>
                                         <Button variant="link" className="text-decoration-none">
                                             <FontAwesomeIcon icon={faClipboard} />
                                         </Button>
                                     </CopyToClipboard>
-                                </td>
-                                <td>
-                                    {renderLink(data.dest_network, data.dest_address, true)}
-                                    {data.dest_address && (
-                                        <CopyToClipboard text={data.dest_address || ''}>
-                                            <Button variant="link" className="text-decoration-none">
-                                                <FontAwesomeIcon icon={faClipboard} />
-                                            </Button>
-                                        </CopyToClipboard>
-                                    )}
-                                </td>
-                                <td colSpan={5}></td>
-                            </tr>
-                            <tr>
-                                <td>Error</td>
-                                <td>{data.src_error || ''}</td>
-                                <td>{data.dest_error || ''}</td>
-                                <td>{data.response_error || ''}</td>
-                                <td>{data.rollback_error || ''}</td>
-                            </tr>
-                            <tr>
-                                <td>Created At</td>
-                                <td colSpan={4}>{formatDate(data.created_at)}</td>
-                            </tr>
-                        </tbody>
-                    </Table>
-                </CardBody>
-            </Card>
+                                )}
+                            </td>
+                            <td colSpan={5}></td>
+                        </tr>
+                        <tr>
+                            <td>Error</td>
+                            <td>{data.src_error || ''}</td>
+                            <td>{data.dest_error || ''}</td>
+                            <td>{data.response_error || ''}</td>
+                            <td>{data.rollback_error || ''}</td>
+                        </tr>
+                        <tr>
+                            <td>Created At</td>
+                            <td colSpan={4}>{formatDate(data.created_at)}</td>
+                        </tr>
+                    </tbody>
+                </Table>
+            </CardBody>
             <MessageModal show={showModal} handleClose={handleCloseModal} message={data} />
-        </div>
+        </Card>
     )
 }
 

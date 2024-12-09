@@ -4,7 +4,7 @@ import Loading from '@/components/Loading/Loading'
 import { executeRelay, findMissedBy } from '@/utils/relay-action'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
-import { Alert, Button, Card, Col, Container, Form, FormControl, InputGroup, Row } from 'react-bootstrap'
+import { Alert, Button, Col, Form, FormControl, InputGroup } from 'react-bootstrap'
 
 interface ManualRelayFormProps {
     nid: string
@@ -48,40 +48,29 @@ const ManualRelayForm: React.FC<ManualRelayFormProps> = ({ relayerId, nid }) => 
     }
 
     return (
-        <Container className="mt-5">
-            <Row className="justify-content-center">
-                <Col md={8}>
-                    <Card>
-                        <Card.Header className="bg-primary text-white">
-                            <h4>Manual Relay</h4>
-                        </Card.Header>
-                        <Card.Body>
-                            {loading ? (
-                                <Loading />
-                            ) : (
-                                <Form onSubmit={handleRelay}>
-                                    <InputGroup className="mb-3">
-                                        <FormControl
-                                            placeholder="Transaction Hash"
-                                            aria-label="Transaction Hash"
-                                            aria-describedby="basic-addon2"
-                                            value={txHash}
-                                            onChange={(e) => setTxHash(e.target.value)}
-                                        />
-                                        <Button variant="primary" type="submit" disabled={!txHash}>
-                                            Relay
-                                        </Button>
-                                    </InputGroup>
-                                </Form>
-                            )}
-                            <Alert variant="info" show={showNotification} onClose={handleCloseNotification} dismissible>
-                                {notificationMessage}
-                            </Alert>
-                        </Card.Body>
-                    </Card>
-                </Col>
-            </Row>
-        </Container>
+        <Col>
+            {loading ? (
+                <Loading />
+            ) : (
+                <Form onSubmit={handleRelay}>
+                    <InputGroup className="mb-3">
+                        <FormControl
+                            placeholder="Transaction Hash"
+                            aria-label="Transaction Hash"
+                            aria-describedby="basic-addon2"
+                            value={txHash}
+                            onChange={(e) => setTxHash(e.target.value)}
+                        />
+                        <Button variant="primary" type="submit" disabled={!txHash}>
+                            Relay
+                        </Button>
+                    </InputGroup>
+                </Form>
+            )}
+            <Alert variant="info" show={showNotification} onClose={handleCloseNotification} dismissible>
+                {notificationMessage}
+            </Alert>
+        </Col>
     )
 }
 

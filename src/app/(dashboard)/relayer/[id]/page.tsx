@@ -1,6 +1,8 @@
-import RelayerDetails from '@/components/Page/Dashboard/RelayerDetails';
+import RelayerDetails from '@/components/Page/Dashboard/RelayerDetails'
 
-export default async function Page({ params }: { params: { id: string } }) {
-  const id = params.id;
-  return <RelayerDetails id={id} />
-};
+type Params = Promise<{ id: string }>
+
+export default async function Page({ params }: { params: Params }) {
+    const { id } = await params
+    return <RelayerDetails id={id} />
+}
