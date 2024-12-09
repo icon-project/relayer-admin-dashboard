@@ -9,7 +9,7 @@
         "lint": "next lint"
     },
     "dependencies": {
-        "@formatjs/intl-localematcher": "^0.5.8",
+        "@formatjs/intl-localematcher": "^0.5.9",
         "@fortawesome/fontawesome-svg-core": "^6.7.1",
         "@fortawesome/free-brands-svg-icons": "^6.7.1",
         "@fortawesome/free-regular-svg-icons": "^6.7.1",
@@ -30,7 +30,6 @@
         "react": "^19.0.0",
         "react-bootstrap": "^2.10.6",
         "react-chartjs-2": "^5.2.0",
-        "react-copy-to-clipboard": "^5.1.0",
         "react-dom": "^19.0.0",
         "react-paginate": "^8.2.0",
         "react-responsive": "^10.0.0",
@@ -45,7 +44,6 @@
         "@types/negotiator": "^0.6.3",
         "@types/node": "^22.10.1",
         "@types/react": "^19.0.1",
-        "@types/react-copy-to-clipboard": "^5.0.7",
         "@types/react-dom": "^19.0.1",
         "@typescript-eslint/eslint-plugin": "^8.17.0",
         "@typescript-eslint/parser": "^8.17.0",

@@ -18,6 +18,12 @@ const zodMap = {
 
 // Set zod error map by user's locale.
 // The error message should be translated based on user's locale.
-z.setErrorMap((err, ctx) => zodMap[getLocale()](err, ctx))
+z.setErrorMap((err, ctx) => {
+    let message = 'An error occurred'
+    getLocale().then((locale) => {
+        message = zodMap[locale](err, ctx).message
+    })
+    return { message }
+})
 
 export { z }

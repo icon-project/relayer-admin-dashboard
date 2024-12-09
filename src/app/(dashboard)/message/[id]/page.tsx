@@ -11,7 +11,9 @@ const fetchMessage = async (id: number): Promise<MessageByIdResponse> => {
     return data
 }
 
-export default async function Page({ params }: { params: { id: number } }) {
+type Params = Promise<{ id: number; nid: string }>
+
+export default async function Page({ params }: { params: Params }) {
     const { id } = await params
     const data = await fetchMessage(id)
     return <MessageDetail message={data} />

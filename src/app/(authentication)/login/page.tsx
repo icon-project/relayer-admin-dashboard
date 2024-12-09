@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Col, Row } from 'react-bootstrap'
 
 export default async function Page({ searchParams }: { searchParams: SearchParams }) {
-    const { callbackUrl } = searchParams
+    const { callbackUrl } = await searchParams
     const dict = await getDictionary()
 
     const getCallbackUrl = () => {

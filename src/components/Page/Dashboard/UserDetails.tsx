@@ -1,12 +1,12 @@
 'use client'
 
+import CopyToClipboardButton from '@/components/Clipboard/CopyToClipboard'
 import { User } from '@/utils/user'
-import { faCopy, faEye } from '@fortawesome/free-regular-svg-icons'
+import { faEye } from '@fortawesome/free-regular-svg-icons'
 import { faEyeLowVision } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { FC, useState } from 'react'
 import { Button, Table } from 'react-bootstrap'
-import CopyToClipboard from 'react-copy-to-clipboard'
 
 interface UserDetailsProps {
     user: User
@@ -44,11 +44,7 @@ const UserDetails: FC<UserDetailsProps> = ({ user }) => {
                                 <FontAwesomeIcon icon={faEye} />
                             )}
                         </Button>
-                        <CopyToClipboard text={user.password}>
-                            <Button variant="outline-secondary" size="sm" className="ml-2">
-                                <FontAwesomeIcon icon={faCopy} />
-                            </Button>
-                        </CopyToClipboard>
+                        <CopyToClipboardButton content={user.password} />
                     </td>
                 </tr>
                 <tr>

@@ -1,12 +1,10 @@
 'use client'
 
+import CopyToClipboardButton from '@/components/Clipboard/CopyToClipboard'
 import { MessageByIdResponse } from '@/utils/xcall-fetcher'
-import { faClipboard } from '@fortawesome/free-regular-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import moment from 'moment'
 import { FC, useState } from 'react'
-import { Button, Card, CardBody, CardHeader, Table } from 'react-bootstrap'
-import { CopyToClipboard } from 'react-copy-to-clipboard'
+import { Button, Card, Table } from 'react-bootstrap'
 import MessageModal from './MessageModal'
 
 type Props = {
@@ -22,8 +20,12 @@ const MessageDetail: FC<Props> = ({ message }) => {
     const handleShowModal = () => setShowModal(true)
 
     const formatDate = (date: string) => {
-        const timeStamp = parseInt(date) * 1000
-        return `${moment(timeStamp).format('MM Do YYYY, h:mm:ss a')} (${moment(timeStamp).fromNow()})`
+        try {
+            const timeStamp = parseInt(date) * 1000
+            return `${moment(timeStamp).format('MM Do YYYY, h:mm:ss a')} (${moment(timeStamp).fromNow()})`
+        } catch (error) {
+            return ''
+        }
     }
 
     const truncateHash = (hash: string | null) => {
@@ -47,8 +49,8 @@ const MessageDetail: FC<Props> = ({ message }) => {
 
     return (
         <Card className="mb-4">
-            <CardHeader className="bg-primary text-white d-flex justify-content-between align-items-center">
-                <span>
+            <Card.Header className="bg-primary text-white d-flex justify-content-between align-items-center">
+                <span className="h5">
                     {data.src_network} -{'>'} {data.dest_network}
                 </span>
                 {(data.status === 'pending' || data.status === 'delivered') && (
@@ -56,8 +58,8 @@ const MessageDetail: FC<Props> = ({ message }) => {
                         Relay Message
                     </Button>
                 )}
-            </CardHeader>
-            <CardBody>
+            </Card.Header>
+            <Card.Body>
                 <Table striped bordered hover>
                     <thead>
                         <tr>
@@ -79,38 +81,22 @@ const MessageDetail: FC<Props> = ({ message }) => {
                             <td>Block Number</td>
                             <td>
                                 {data.src_block_number}
-                                <CopyToClipboard text={data.src_block_number || ''}>
-                                    <Button variant="link" className="text-decoration-none">
-                                        <FontAwesomeIcon icon={faClipboard} />
-                                    </Button>
-                                </CopyToClipboard>
+                                {data.src_block_number && <CopyToClipboardButton content={data.src_block_number} />}
                             </td>
                             <td>
                                 {data.dest_block_number || ''}
-                                <CopyToClipboard text={data.dest_block_number || ''}>
-                                    <Button variant="link" className="text-decoration-none">
-                                        <FontAwesomeIcon icon={faClipboard} />
-                                    </Button>
-                                </CopyToClipboard>
+                                {data.dest_block_number && <CopyToClipboardButton content={data.dest_block_number} />}
                             </td>
                             <td>
                                 {data.response_block_number || ''}
                                 {data.response_block_number && (
-                                    <CopyToClipboard text={data.response_block_number || ''}>
-                                        <Button variant="link" className="text-decoration-none">
-                                            <FontAwesomeIcon icon={faClipboard} />
-                                        </Button>
-                                    </CopyToClipboard>
+                                    <CopyToClipboardButton content={data.response_block_number} />
                                 )}
                             </td>
                             <td>
                                 {data.rollback_block_number || ''}
                                 {data.rollback_block_number && (
-                                    <CopyToClipboard text={data.rollback_block_number || ''}>
-                                        <Button variant="link" className="text-decoration-none">
-                                            <FontAwesomeIcon icon={faClipboard} />
-                                        </Button>
-                                    </CopyToClipboard>
+                                    <CopyToClipboardButton content={data.rollback_block_number} />
                                 )}
                             </td>
                         </tr>
@@ -125,60 +111,30 @@ const MessageDetail: FC<Props> = ({ message }) => {
                             <td>TX Hash</td>
                             <td>
                                 {renderLink(data.src_network, data.src_tx_hash, false)}
-                                <CopyToClipboard text={data.src_tx_hash || ''}>
-                                    <Button variant="link" className="text-decoration-none">
-                                        <FontAwesomeIcon icon={faClipboard} />
-                                    </Button>
-                                </CopyToClipboard>
+                                <CopyToClipboardButton content={data.src_tx_hash || ''} />
                             </td>
                             <td>
                                 {renderLink(data.dest_network, data.dest_tx_hash, false)}
-                                <CopyToClipboard text={data.dest_tx_hash || ''}>
-                                    <Button variant="link" className="text-decoration-none">
-                                        <FontAwesomeIcon icon={faClipboard} />
-                                    </Button>
-                                </CopyToClipboard>
+                                <CopyToClipboardButton content={data.dest_tx_hash || ''} />
                             </td>
                             <td>
                                 {renderLink(data.dest_network, data.response_tx_hash, false)}
-                                {data.response_tx_hash && (
-                                    <CopyToClipboard text={data.response_tx_hash || ''}>
-                                        <Button variant="link" className="text-decoration-none">
-                                            <FontAwesomeIcon icon={faClipboard} />
-                                        </Button>
-                                    </CopyToClipboard>
-                                )}
+                                {data.response_tx_hash && <CopyToClipboardButton content={data.response_tx_hash} />}
                             </td>
                             <td>
                                 {renderLink(data.dest_network, data.rollback_tx_hash, false)}
-                                {data.rollback_tx_hash && (
-                                    <CopyToClipboard text={data.rollback_tx_hash || ''}>
-                                        <Button variant="link" className="text-decoration-none">
-                                            <FontAwesomeIcon icon={faClipboard} />
-                                        </Button>
-                                    </CopyToClipboard>
-                                )}
+                                {data.rollback_tx_hash && <CopyToClipboardButton content={data.rollback_tx_hash} />}
                             </td>
                         </tr>
                         <tr>
                             <td>Address</td>
                             <td>
                                 {renderLink(data.src_network, data.src_address, true)}
-                                <CopyToClipboard text={data.src_address || ''}>
-                                    <Button variant="link" className="text-decoration-none">
-                                        <FontAwesomeIcon icon={faClipboard} />
-                                    </Button>
-                                </CopyToClipboard>
+                                <CopyToClipboardButton content={data.src_address} />
                             </td>
                             <td>
                                 {renderLink(data.dest_network, data.dest_address, true)}
-                                {data.dest_address && (
-                                    <CopyToClipboard text={data.dest_address || ''}>
-                                        <Button variant="link" className="text-decoration-none">
-                                            <FontAwesomeIcon icon={faClipboard} />
-                                        </Button>
-                                    </CopyToClipboard>
-                                )}
+                                {data.dest_address && <CopyToClipboardButton content={data.dest_address} />}
                             </td>
                             <td colSpan={5}></td>
                         </tr>
@@ -195,7 +151,7 @@ const MessageDetail: FC<Props> = ({ message }) => {
                         </tr>
                     </tbody>
                 </Table>
-            </CardBody>
+            </Card.Body>
             <MessageModal show={showModal} handleClose={handleCloseModal} message={data} />
         </Card>
     )

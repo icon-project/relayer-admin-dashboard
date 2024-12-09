@@ -236,8 +236,9 @@ export async function getAvailableRelayers(): Promise<RelayerInfo[]> {
     return relayers.map((r: RelayerConfig) => ({ id: r.id, name: r.name }))
 }
 
-export function getCurrentRelayer(): string {
-    return cookies().get('relayerId')?.value ?? ''
+export async function getCurrentRelayer(): Promise<string> {
+    const cookieStore = await cookies()
+    return cookieStore.get('relayerId')?.value ?? ''
 }
 
 export interface MissedRelayer {
