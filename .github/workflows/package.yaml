@@ -53,7 +53,7 @@ jobs:
           COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
           COSIGN_YES: true
-        run:
+        run: |
           cosign sign-blob --key env://COSIGN_PRIVATE_KEY relayer-admin-dashboard.deb
           cosign public-key --key env://COSIGN_PRIVATE_KEY > cosign.pub
 
