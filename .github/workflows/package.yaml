@@ -123,6 +123,9 @@ jobs:
       - name: Tag with stable
         run: docker tag iconcommunity/relayer-admin-dashboard:${{ github.event.inputs.tag }} iconcommunity/relayer-admin-dashboard:stable
 
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
       - name: Sign relayer image
         env:
           COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
