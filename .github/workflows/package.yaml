@@ -54,8 +54,8 @@ jobs:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
           COSIGN_YES: true
         run: |
-          cosign sign-blob --key env://COSIGN_PRIVATE_KEY relayer-admin-dashboard.deb
-          cosign public-key --key env://COSIGN_PRIVATE_KEY > cosign.pub
+          cosign sign-blob --key env://COSIGN_PRIVATE_KEY relayer-admin-dashboard.deb --output relayer-admin-dashboard.deb.sig
+          cosign public-key --key env://COSIGN_PRIVATE_KEY --outfile cosign.pub
 
       - name: Release
         uses: softprops/action-gh-release@v2
