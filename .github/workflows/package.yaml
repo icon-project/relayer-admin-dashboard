@@ -3,12 +3,13 @@ name: Build, package and release
 on:
   workflow_dispatch:
     inputs:
-      tag:
+      version:
         description: 'Tag to build and release'
+        type: string
         required: true
       is_stable:
         description: 'Is this a stable release?'
-        default: 'false'
+        type: boolean
 
 jobs:
   build:
@@ -25,11 +26,17 @@ jobs:
       - name: Build Next.js application
         run: bun run build
 
-      - name: Extract version from tag
-        id: extract_version
-        run: echo "VERSION=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+      - name: Output version information
+        id: version
+        env:
+          TAG: ${{ inputs.version }}
+        run: |
+          echo "DEBIAN_VERSION=${TAG#v}" >> $GITHUB_OUTPUT
+          echo "DOCKER_TAG=${{ inputs.is_stable == 'true' && 'latest' || 'unstable' }}" >> $GITHUB_OUTPUT
 
       - name: Update control file version
+        env:
+          VERSION: ${{ steps.version.outputs.DEBIAN_VERSION }}
         run: |
           sed -i "s/^Version: .*/Version: ${VERSION}/" debian/DEBIAN/control
           cat debian/DEBIAN/control
@@ -65,10 +72,10 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           build-args: |
-            - DASHBOARD_VERSION=${{ github.ref_name }}
+            - DASHBOARD_VERSION=${{ inputs.version }}
           tags: |
-            iconcommunity/relayer-admin-dashboard:latest
-            iconcommunity/relayer-admin-dashboard:${{ github.ref_name }}
+            iconcommunity/relayer-admin-dashboard:${{ steps.version.outputs.DOCKER_TAG }}
+            iconcommunity/relayer-admin-dashboard:${{ inputs.version }}
 
       - name: Install cosign
         uses: sigstore/cosign-installer@v3
@@ -79,8 +86,8 @@ jobs:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
           COSIGN_YES: true
         run: |
-          cosign sign --key env://COSIGN_PRIVATE_KEY iconcommunity/relayer-admin-dashboard:latest
-          cosign sign --key env://COSIGN_PRIVATE_KEY iconcommunity/relayer-admin-dashboard:${{ github.ref_name }}
+          cosign sign --key env://COSIGN_PRIVATE_KEY iconcommunity/relayer-admin-dashboard:${{ steps.version.outputs.DOCKER_TAG }}
+          cosign sign --key env://COSIGN_PRIVATE_KEY iconcommunity/relayer-admin-dashboard:${{ inputs.version }}
           cosign sign-blob --key env://COSIGN_PRIVATE_KEY relayer-admin-dashboard.deb
           cosign public-key --key env://COSIGN_PRIVATE_KEY > cosign.pub
 
@@ -92,9 +99,9 @@ jobs:
             relayer-admin-dashboard.deb
             relayer-admin-dashboard.deb.sig
             cosign.pub
-          tag_name: ${{ github.ref_name }}
+          tag_name: ${{ inputs.version }}
           body: |
-            Release ${{ github.ref_name }}
+            Release ${{ inputs.version }}
           draft: false
           make_latest: ${{ github.ref_name == 'v*.*.*' && inputs.is_stable == 'true' }}
-          prerelease: ${{ github.ref_name == 'v*.*.*-*' }}
+          prerelease: ${{ inputs.is_stable == 'false' }}
